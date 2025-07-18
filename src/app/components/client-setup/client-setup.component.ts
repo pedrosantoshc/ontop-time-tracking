@@ -29,7 +29,7 @@ import { Client, Worker } from '../../models/interfaces';
         <!-- Setup Form -->
         <div class="card-ontop mb-6">
           <h2 class="text-xl font-semibold mb-4">Import Your Hourly Workers</h2>
-          <p class="text-gray-600 mb-6">Upload your Ontop contracts CSV to automatically import hourly workers and start tracking time.</p>
+          <p class="text-gray-600 mb-6">Upload your Ontop contracts file (CSV or Excel format) to automatically import hourly workers and start tracking time.</p>
 
           <!-- File Upload -->
           <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center mb-6" 
@@ -42,10 +42,10 @@ import { Client, Worker } from '../../models/interfaces';
               <div class="mx-auto w-12 h-12 text-gray-400 mb-4">
                 📄
               </div>
-              <p class="text-lg font-medium text-gray-900 mb-2">Upload Ontop Contracts CSV</p>
-              <p class="text-gray-600 mb-4">Drag and drop your file here, or click to browse</p>
+              <p class="text-lg font-medium text-gray-900 mb-2">Upload Ontop Contracts File</p>
+              <p class="text-gray-600 mb-4">Drag and drop your CSV or Excel file here, or click to browse</p>
               <input type="file" 
-                     accept=".csv" 
+                     accept=".csv,.xlsx" 
                      (change)="onFileSelected($event)" 
                      class="hidden" 
                      #fileInput>
@@ -68,10 +68,10 @@ import { Client, Worker } from '../../models/interfaces';
                 </button>
               </div>
               
-              <button (click)="processCSV()" 
+              <button (click)="processFile()" 
                       [disabled]="isProcessing" 
                       class="btn-ontop-primary w-full mt-4">
-                <span *ngIf="!isProcessing">Process CSV</span>
+                <span *ngIf="!isProcessing">Process File</span>
                 <span *ngIf="isProcessing">Processing...</span>
               </button>
             </div>
@@ -187,7 +187,7 @@ export class ClientSetupComponent {
     this.successMessage = '';
   }
 
-  async processCSV() {
+  async processFile() {
     if (!this.selectedFile) return;
 
     this.isProcessing = true;
@@ -196,14 +196,14 @@ export class ClientSetupComponent {
 
     try {
       // Validate file
-      await this.csvService.validateCSVFile(this.selectedFile);
+      await this.csvService.validateFile(this.selectedFile);
       
-      // Read and parse CSV
-      const csvContent = await this.csvService.readCSVFile(this.selectedFile);
-      this.workers = this.csvService.parseOntopCSV(csvContent);
+      // Read and parse file (CSV or XLSX)
+      const fileContent = await this.csvService.readFile(this.selectedFile);
+      this.workers = this.csvService.parseOntopData(fileContent);
 
       if (this.workers.length === 0) {
-        throw new Error('No hourly workers found in the CSV. Make sure workers have "Per hour" as payment unit.');
+        throw new Error('No hourly workers found in the file. Make sure workers have "Per hour" as payment unit.');
       }
 
       // Save to storage
@@ -227,7 +227,7 @@ export class ClientSetupComponent {
       this.successMessage = `Successfully imported ${this.workers.length} hourly workers!`;
       
     } catch (error: any) {
-      this.errorMessage = error.message || 'Failed to process CSV file';
+      this.errorMessage = error.message || 'Failed to process file';
     } finally {
       this.isProcessing = false;
     }
