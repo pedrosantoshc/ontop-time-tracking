@@ -19,7 +19,7 @@ import { v4 as uuidv4 } from 'uuid';
         <div class="card-ontop mb-6" *ngIf="worker">
           <div class="flex items-center justify-between mb-4">
             <div>
-              <h1 class="text-2xl font-bold text-gray-900">Good {{ getTimeOfDay() }}, {{ worker.name }}! 👋</h1>
+              <h1 class="text-2xl font-bold text-gray-900">Good {{ getTimeOfDay() }}, {{ worker.name }}! <mat-icon class="inline-icon">waving_hand</mat-icon></h1>
               <p class="text-gray-600">Track your time and manage your work sessions</p>
             </div>
             <div class="text-right">
@@ -32,7 +32,7 @@ import { v4 as uuidv4 } from 'uuid';
         <!-- Error Message -->
         <div *ngIf="errorMessage" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
           <div class="flex items-center space-x-2">
-            <span class="text-red-600">⚠️</span>
+            <mat-icon class="text-red-600">warning</mat-icon>
             <p class="text-red-800">{{ errorMessage }}</p>
           </div>
         </div>
@@ -51,7 +51,7 @@ import { v4 as uuidv4 } from 'uuid';
           
           <!-- Clock In/Out Panel (Only for 'clock' mode) -->
           <div *ngIf="worker.trackingMode === 'clock'" class="card-ontop">
-            <h3 class="text-lg font-semibold mb-4">⏰ Clock In/Out</h3>
+            <h3 class="text-lg font-semibold mb-4"><mat-icon class="inline-icon">schedule</mat-icon> Clock In/Out</h3>
             
             <div class="text-center mb-6">
               <div class="text-4xl font-mono font-bold text-gray-900 mb-2">
@@ -68,7 +68,7 @@ import { v4 as uuidv4 } from 'uuid';
                 (click)="clockIn()" 
                 [disabled]="isProcessing"
                 mat-raised-button color="primary" class="w-full text-lg py-3">
-                🟢 CLOCK IN
+                <mat-icon>play_arrow</mat-icon> CLOCK IN
               </button>
               
               <button 
@@ -76,14 +76,14 @@ import { v4 as uuidv4 } from 'uuid';
                 (click)="clockOut()" 
                 [disabled]="isProcessing"
                 mat-stroked-button class="w-full text-lg py-3">
-                🔴 CLOCK OUT
+                <mat-icon>stop</mat-icon> CLOCK OUT
               </button>
               
               <!-- Request Adjustment Button -->
               <button 
                 (click)="requestAdjustment()" 
                 mat-stroked-button class="w-full text-sm py-2 border border-gray-300">
-                📝 Request Time Adjustment
+                <mat-icon>edit</mat-icon> Request Time Adjustment
               </button>
             </div>
 
@@ -102,7 +102,7 @@ import { v4 as uuidv4 } from 'uuid';
 
           <!-- Request Adjustment Panel (For clock mode when showing adjustment form) -->
           <div *ngIf="worker.trackingMode === 'clock' && showAdjustmentForm" class="card-ontop">
-            <h3 class="text-lg font-semibold mb-4">📝 Request Time Adjustment</h3>
+            <h3 class="text-lg font-semibold mb-4"><mat-icon class="inline-icon">edit</mat-icon> Request Time Adjustment</h3>
             <p class="text-sm text-gray-600 mb-4">Submit a manual entry that requires client approval.</p>
             
             <div class="space-y-4">
@@ -156,7 +156,7 @@ import { v4 as uuidv4 } from 'uuid';
 
           <!-- Daily Hours Entry Panel (Only for 'timesheet' mode) -->
           <div *ngIf="worker.trackingMode === 'timesheet'" class="card-ontop lg:col-span-2">
-            <h3 class="text-lg font-semibold mb-4">📋 Register Daily Hours</h3>
+            <h3 class="text-lg font-semibold mb-4"><mat-icon class="inline-icon">assignment</mat-icon> Register Daily Hours</h3>
             <p class="text-sm text-gray-600 mb-4">Enter your daily hours with required proof of work.</p>
             
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -204,7 +204,7 @@ import { v4 as uuidv4 } from 'uuid';
                       (click)="captureScreenshot()" 
                       [disabled]="isProcessing"
                       mat-raised-button color="primary" class="flex items-center justify-center space-x-2 py-2">
-                      <span>📷</span>
+                      <mat-icon>camera_alt</mat-icon>
                       <span>Take Screenshot</span>
                     </button>
                     
@@ -219,7 +219,7 @@ import { v4 as uuidv4 } from 'uuid';
                         (click)="fileInput.click()" 
                         [disabled]="isProcessing"
                         mat-stroked-button class="w-full flex items-center justify-center space-x-2 py-2">
-                        <span>📎</span>
+                        <mat-icon>attach_file</mat-icon>
                         <span>Upload File</span>
                       </button>
                     </div>
@@ -232,7 +232,7 @@ import { v4 as uuidv4 } from 'uuid';
                       <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-2">
                           <span *ngIf="proof.type === 'screenshot'">📷</span>
-                          <span *ngIf="proof.type === 'file'">📎</span>
+                          <mat-icon *ngIf="proof.type === 'file'">attach_file</mat-icon>
                           <span>{{ proof.fileName || 'Screenshot' }}</span>
                         </div>
                         <button 
@@ -262,7 +262,7 @@ import { v4 as uuidv4 } from 'uuid';
 
         <!-- Proof of Work Panel (Only for clock mode) -->
         <div *ngIf="worker && worker.trackingMode === 'clock'" class="card-ontop mb-6">
-          <h3 class="text-lg font-semibold mb-4">📸 Proof of Work</h3>
+          <h3 class="text-lg font-semibold mb-4"><mat-icon class="inline-icon">photo_camera</mat-icon> Proof of Work</h3>
           
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <button 
@@ -284,7 +284,7 @@ import { v4 as uuidv4 } from 'uuid';
                 (click)="fileInput.click()" 
                 [disabled]="isProcessing"
                 mat-stroked-button class="w-full flex items-center justify-center space-x-2 py-3">
-                <span>📎</span>
+                <mat-icon>attach_file</mat-icon>
                 <span>Upload File</span>
               </button>
             </div>
@@ -297,8 +297,8 @@ import { v4 as uuidv4 } from 'uuid';
               <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
                   <span *ngIf="proof.type === 'screenshot'">📷</span>
-                  <span *ngIf="proof.type === 'file'">📎</span>
-                  <span *ngIf="proof.type === 'note'">📝</span>
+                  <mat-icon *ngIf="proof.type === 'file'">attach_file</mat-icon>
+                  <mat-icon *ngIf="proof.type === 'note'">note</mat-icon>
                   <div>
                     <p class="font-medium">{{ proof.fileName || 'Screenshot' }}</p>
                     <p class="text-sm text-gray-600">{{ formatTime(proof.timestamp) }}</p>
@@ -317,7 +317,7 @@ import { v4 as uuidv4 } from 'uuid';
 
         <!-- Today's Time Entries -->
         <div *ngIf="worker && todayEntries.length > 0" class="card-ontop">
-          <h3 class="text-lg font-semibold mb-4">📋 Today's Time Entries</h3>
+          <h3 class="text-lg font-semibold mb-4"><mat-icon class="inline-icon">today</mat-icon> Today's Time Entries</h3>
           
           <div class="space-y-3">
             <div *ngFor="let entry of todayEntries" class="bg-gray-50 rounded-lg p-4">
@@ -351,7 +351,7 @@ import { v4 as uuidv4 } from 'uuid';
         <!-- Timesheet History Section -->
         <div *ngIf="worker" class="card-ontop">
           <div class="flex items-center justify-between mb-6">
-            <h3 class="text-lg font-semibold">📈 My Timesheet History</h3>
+            <h3 class="text-lg font-semibold"><mat-icon class="inline-icon">analytics</mat-icon> My Timesheet History</h3>
             <div class="flex items-center space-x-2">
               <select [(ngModel)]="historyFilter" (ngModelChange)="filterHistory()" 
                       class="p-2 border border-gray-300 rounded-lg text-sm">
@@ -410,7 +410,7 @@ import { v4 as uuidv4 } from 'uuid';
               <!-- Proof of Work Indicator -->
               <div *ngIf="entry.proofOfWork.length > 0" class="mb-3">
                 <div class="flex items-center space-x-2 text-sm text-gray-600">
-                  <span>📎</span>
+                  <mat-icon>attach_file</mat-icon>
                   <span>{{ entry.proofOfWork.length }} proof(s) of work attached</span>
                 </div>
               </div>

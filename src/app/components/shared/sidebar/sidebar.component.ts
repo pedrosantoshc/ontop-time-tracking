@@ -68,12 +68,6 @@ export class SidebarComponent implements OnInit {
       label: 'Settings',
       icon: 'settings',
       route: '/client/settings'
-    },
-    {
-      label: 'Help & Support',
-      icon: 'help',
-      route: '#', // Will open help modal
-      disabled: false
     }
   ];
 

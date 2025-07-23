@@ -1,43 +1,8 @@
 <app-main-layout>
   
-  <!-- Approvals Page Header -->
+  <!-- Approvals Content -->
   <div class="approvals-content">
     
-    <!-- Page Header Section -->
-    <div class="section">
-      <mat-card class="header-card mat-elevation-z1">
-        <mat-card-header class="approvals-header">
-          <div class="header-content">
-            <div class="title-section">
-              <mat-card-title class="page-title">
-                <mat-icon class="title-icon">fact_check</mat-icon>
-                <span>Time Approvals</span>
-              </mat-card-title>
-              <p class="page-subtitle">Review and approve worker time entries</p>
-            </div>
-            
-            <div class="action-buttons">
-              <app-button 
-                variant="secondary" 
-                icon="dashboard"
-                (click)="goToDashboard()"
-                class="nav-button">
-                <span class="button-text">Dashboard</span>
-              </app-button>
-              
-              <app-button 
-                variant="secondary" 
-                icon="analytics"
-                (click)="goToReports()"
-                class="nav-button">
-                <span class="button-text">Reports</span>
-              </app-button>
-            </div>
-          </div>
-        </mat-card-header>
-      </mat-card>
-    </div>
-
     <!-- Pending Approvals Section -->
     <div class="section">
       <app-pending-approvals></app-pending-approvals>
