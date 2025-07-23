@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute } from '@angular/router';
 import { StorageService } from '../../services/storage.service';
 import { Worker, TimeEntry, ProofOfWork } from '../../models/interfaces';
@@ -10,7 +11,7 @@ import { v4 as uuidv4 } from 'uuid';
 @Component({
   selector: 'app-worker-tracking',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatButtonModule],
+  imports: [CommonModule, FormsModule, MatButtonModule, MatIconModule],
   template: `
     <div class="min-h-screen bg-ontop-gray p-4">
       <div class="max-w-4xl mx-auto">
