@@ -1,0 +1,99 @@
+# Ontop Time Tracking MVP - Cursor Rules
+
+## Project Overview
+Building a time tracking MVP for Ontop to compete with Deel/Rippling. 3-day sprint to create proof of concept.
+
+## Core Requirements
+- Angular v19 + Tailwind CSS
+- Standalone app with own URL
+- CSV import from Ontop contracts (filter "Per Hour")
+- Clock in/out + manual hour entry
+- Screenshot proof of work
+- Client approval workflow
+- CSV export for payroll
+
+## Design System (Match Ontop Platform)
+- Primary Blue: #4F46E5
+- Secondary Red: #EF4444  
+- Background: #F8FAFC
+- Cards: White with subtle shadows
+- 8px border radius
+- Clean typography
+- Tab-based navigation
+- Data tables with filters
+
+## Data Models
+```typescript
+interface Client {
+  id: string;
+  name: string;
+  email: string;
+  trackingPreferences: {
+    allowClockInOut: boolean;
+    allowManualEntry: boolean;
+    requireProofOfWork: boolean;
+    screenshotFrequency: 'manual' | 'random' | 'disabled';
+  };
+  workers: Worker[];
+}
+
+interface Worker {
+  contractorId: string;
+  name: string;
+  email: string;
+  inviteToken: string;
+  isActive: boolean;
+}
+
+interface TimeEntry {
+  id: string;
+  workerId: string;
+  date: string;
+  startTime?: string;
+  endTime?: string;
+  manualHours?: number;
+  description: string;
+  proofOfWork: ProofOfWork[];
+  status: 'draft' | 'submitted' | 'approved' | 'rejected';
+  clientNotes?: string;
+}
+```
+
+## Development Priorities
+1. CSV import/parsing functionality
+2. Dual time tracking (clock + manual)
+3. Screenshot capture
+4. Approval workflow
+5. CSV export
+
+## File Structure
+```
+src/
+├── app/
+│   ├── components/
+│   │   ├── client-dashboard/
+│   │   ├── worker-tracking/
+│   │   ├── time-entry/
+│   │   └── shared/
+│   ├── services/
+│   │   ├── csv-import.service.ts
+│   │   ├── time-tracking.service.ts
+│   │   └── storage.service.ts
+│   └── models/
+│       └── interfaces.ts
+```
+
+## Code Style
+- Use TypeScript strict mode
+- Implement proper error handling
+- Mobile-first responsive design
+- Follow Angular best practices
+- Use Tailwind for all styling
+- LocalStorage for MVP data persistence
+
+## Daily Milestones
+- Day 1: CSV import + client dashboard
+- Day 2: Worker tracking + screenshots  
+- Day 3: Approval workflow + export
+
+Always reference docs/PRD.md for detailed specifications and user stories. 
