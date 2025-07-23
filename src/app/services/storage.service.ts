@@ -52,7 +52,37 @@ export class StorageService {
 
   getWorkerByToken(token: string): Worker | null {
     const workers = this.getWorkers();
-    return workers.find(w => w.inviteToken === token) || null;
+    const worker = workers.find(w => w.inviteToken === token) || null;
+    
+    // Sanity check for data integrity
+    if (worker && (worker.name === 'Unknown' || !worker.contractorId || worker.contractorId.trim() === '')) {
+      console.error('Found worker with invalid data:', worker);
+      // Try to recover by checking if there's a better match
+      return this.findValidWorkerAlternative(token, workers) || worker;
+    }
+    
+    return worker;
+  }
+
+  /**
+   * Attempt to find a valid worker when the primary lookup fails
+   */
+  private findValidWorkerAlternative(token: string, workers: Worker[]): Worker | null {
+    // Look for workers with similar tokens or valid data
+    const validWorkers = workers.filter(w => 
+      w.name !== 'Unknown' && 
+      w.contractorId && 
+      w.contractorId.trim() !== '' &&
+      w.contractorId !== 'Unknown'
+    );
+    
+    // If we have exactly one valid worker, it might be the right match
+    if (validWorkers.length === 1) {
+      console.log('Found alternative valid worker:', validWorkers[0]);
+      return validWorkers[0];
+    }
+    
+    return null;
   }
 
   // Time Entries

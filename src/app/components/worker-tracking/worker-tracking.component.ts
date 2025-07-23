@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
 import { ActivatedRoute } from '@angular/router';
 import { StorageService } from '../../services/storage.service';
 import { Worker, TimeEntry, ProofOfWork } from '../../models/interfaces';
@@ -9,7 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 @Component({
   selector: 'app-worker-tracking',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatButtonModule],
   template: `
     <div class="min-h-screen bg-ontop-gray p-4">
       <div class="max-w-4xl mx-auto">
@@ -48,8 +49,8 @@ import { v4 as uuidv4 } from 'uuid';
         <!-- Time Tracking Interface -->
         <div *ngIf="worker" class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           
-          <!-- Clock In/Out Panel -->
-          <div class="card-ontop">
+          <!-- Clock In/Out Panel (Only for 'clock' mode) -->
+          <div *ngIf="worker.trackingMode === 'clock'" class="card-ontop">
             <h3 class="text-lg font-semibold mb-4">⏰ Clock In/Out</h3>
             
             <div class="text-center mb-6">
@@ -66,7 +67,7 @@ import { v4 as uuidv4 } from 'uuid';
                 *ngIf="!isClocked" 
                 (click)="clockIn()" 
                 [disabled]="isProcessing"
-                class="btn-ontop-primary w-full text-lg py-3">
+                mat-raised-button color="primary" class="w-full text-lg py-3">
                 🟢 CLOCK IN
               </button>
               
@@ -74,8 +75,15 @@ import { v4 as uuidv4 } from 'uuid';
                 *ngIf="isClocked" 
                 (click)="clockOut()" 
                 [disabled]="isProcessing"
-                class="btn-ontop-secondary w-full text-lg py-3">
+                mat-stroked-button class="w-full text-lg py-3">
                 🔴 CLOCK OUT
+              </button>
+              
+              <!-- Request Adjustment Button -->
+              <button 
+                (click)="requestAdjustment()" 
+                mat-stroked-button class="w-full text-sm py-2 border border-gray-300">
+                📝 Request Time Adjustment
               </button>
             </div>
 
@@ -92,16 +100,17 @@ import { v4 as uuidv4 } from 'uuid';
             </div>
           </div>
 
-          <!-- Manual Entry Panel -->
-          <div class="card-ontop">
-            <h3 class="text-lg font-semibold mb-4">✏️ Manual Entry</h3>
+          <!-- Request Adjustment Panel (For clock mode when showing adjustment form) -->
+          <div *ngIf="worker.trackingMode === 'clock' && showAdjustmentForm" class="card-ontop">
+            <h3 class="text-lg font-semibold mb-4">📝 Request Time Adjustment</h3>
+            <p class="text-sm text-gray-600 mb-4">Submit a manual entry that requires client approval.</p>
             
             <div class="space-y-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Date</label>
                 <input 
                   type="date" 
-                  [(ngModel)]="manualEntry.date"
+                  [(ngModel)]="adjustmentEntry.date"
                   [max]="today"
                   class="w-full p-3 border border-gray-300 rounded-lg">
               </div>
@@ -110,7 +119,7 @@ import { v4 as uuidv4 } from 'uuid';
                 <label class="block text-sm font-medium text-gray-700 mb-2">Hours Worked</label>
                 <input 
                   type="number" 
-                  [(ngModel)]="manualEntry.manualHours"
+                  [(ngModel)]="adjustmentEntry.manualHours"
                   min="0.25"
                   max="12"
                   step="0.25"
@@ -119,34 +128,147 @@ import { v4 as uuidv4 } from 'uuid';
               </div>
               
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Reason for Adjustment</label>
                 <textarea 
-                  [(ngModel)]="manualEntry.description"
+                  [(ngModel)]="adjustmentEntry.description"
                   class="w-full p-3 border border-gray-300 rounded-lg resize-none"
                   rows="3"
-                  placeholder="Describe what you worked on...">
+                  placeholder="Explain why you need this time adjustment..."
+                  required>
                 </textarea>
               </div>
               
-              <button 
-                (click)="submitManualEntry()" 
-                [disabled]="!isManualEntryValid() || isProcessing"
-                class="btn-ontop-primary w-full">
-                Submit Manual Entry
-              </button>
+              <div class="flex space-x-2">
+                <button 
+                  (click)="submitAdjustment()" 
+                  [disabled]="!isAdjustmentEntryValid() || isProcessing"
+                  mat-raised-button color="primary" class="flex-1">
+                  Submit Request
+                </button>
+                <button 
+                  (click)="cancelAdjustment()" 
+                  mat-stroked-button class="px-4">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Daily Hours Entry Panel (Only for 'timesheet' mode) -->
+          <div *ngIf="worker.trackingMode === 'timesheet'" class="card-ontop lg:col-span-2">
+            <h3 class="text-lg font-semibold mb-4">📋 Register Daily Hours</h3>
+            <p class="text-sm text-gray-600 mb-4">Enter your daily hours with required proof of work.</p>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                  <input 
+                    type="date" 
+                    [(ngModel)]="manualEntry.date"
+                    [max]="today"
+                    class="w-full p-3 border border-gray-300 rounded-lg">
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Hours Worked *</label>
+                  <input 
+                    type="number" 
+                    [(ngModel)]="manualEntry.manualHours"
+                    min="0.25"
+                    max="12"
+                    step="0.25"
+                    class="w-full p-3 border border-gray-300 rounded-lg"
+                    placeholder="e.g., 4.5">
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Work Description *</label>
+                  <textarea 
+                    [(ngModel)]="manualEntry.description"
+                    class="w-full p-3 border border-gray-300 rounded-lg resize-none"
+                    rows="4"
+                    placeholder="Describe what you worked on..."
+                    required>
+                  </textarea>
+                </div>
+              </div>
+              
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Proof of Work * (Required)</label>
+                  <p class="text-xs text-gray-500 mb-3">Upload screenshots, files, or take photos of your work</p>
+                  
+                  <div class="grid grid-cols-1 gap-2">
+                    <button 
+                      (click)="captureScreenshot()" 
+                      [disabled]="isProcessing"
+                      mat-raised-button color="primary" class="flex items-center justify-center space-x-2 py-2">
+                      <span>📷</span>
+                      <span>Take Screenshot</span>
+                    </button>
+                    
+                    <div class="relative">
+                      <input 
+                        type="file" 
+                        (change)="onFileSelected($event)"
+                        accept="image/*,.pdf,.doc,.docx"
+                        class="hidden" 
+                        #fileInput>
+                      <button 
+                        (click)="fileInput.click()" 
+                        [disabled]="isProcessing"
+                        mat-stroked-button class="w-full flex items-center justify-center space-x-2 py-2">
+                        <span>📎</span>
+                        <span>Upload File</span>
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <!-- Today's proof of work for this entry -->
+                  <div *ngIf="manualEntryProof.length > 0" class="mt-3 space-y-2">
+                    <p class="text-sm font-medium text-gray-700">Attached Proof:</p>
+                    <div *ngFor="let proof of manualEntryProof" class="bg-gray-50 rounded-lg p-2 text-sm">
+                      <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                          <span *ngIf="proof.type === 'screenshot'">📷</span>
+                          <span *ngIf="proof.type === 'file'">📎</span>
+                          <span>{{ proof.fileName || 'Screenshot' }}</span>
+                        </div>
+                        <button 
+                          (click)="removeManualEntryProof(proof.id)"
+                          class="text-ontop-red hover:text-red-600">
+                          ✕
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <button 
+                  (click)="submitManualEntry()" 
+                  [disabled]="!isTimesheetEntryValid() || isProcessing"
+                  mat-raised-button color="primary" class="w-full">
+                  Submit Daily Hours
+                </button>
+                
+                <div *ngIf="!isTimesheetEntryValid()" class="text-xs text-gray-500">
+                  * Hours, description, and proof of work are required
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Proof of Work Panel -->
-        <div *ngIf="worker" class="card-ontop mb-6">
+        <!-- Proof of Work Panel (Only for clock mode) -->
+        <div *ngIf="worker && worker.trackingMode === 'clock'" class="card-ontop mb-6">
           <h3 class="text-lg font-semibold mb-4">📸 Proof of Work</h3>
           
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <button 
               (click)="captureScreenshot()" 
               [disabled]="isProcessing"
-              class="btn-ontop-primary flex items-center justify-center space-x-2 py-3">
+              mat-raised-button color="primary" class="flex items-center justify-center space-x-2 py-3">
               <span>📷</span>
               <span>Take Screenshot</span>
             </button>
@@ -161,7 +283,7 @@ import { v4 as uuidv4 } from 'uuid';
               <button 
                 (click)="fileInput.click()" 
                 [disabled]="isProcessing"
-                class="btn-ontop-secondary w-full flex items-center justify-center space-x-2 py-3">
+                mat-stroked-button class="w-full flex items-center justify-center space-x-2 py-3">
                 <span>📎</span>
                 <span>Upload File</span>
               </button>
@@ -226,6 +348,243 @@ import { v4 as uuidv4 } from 'uuid';
           </div>
         </div>
 
+        <!-- Timesheet History Section -->
+        <div *ngIf="worker" class="card-ontop">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold">📈 My Timesheet History</h3>
+            <div class="flex items-center space-x-2">
+              <select [(ngModel)]="historyFilter" (ngModelChange)="filterHistory()" 
+                      class="p-2 border border-gray-300 rounded-lg text-sm">
+                <option value="all">All Entries</option>
+                <option value="approved">Approved</option>
+                <option value="submitted">Pending Review</option>
+                <option value="rejected">Rejected</option>
+                <option value="draft">Drafts</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- History Stats -->
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-green-50 rounded-lg p-4 text-center">
+              <div class="text-2xl font-bold text-green-800">{{ historyStats.approved }}</div>
+              <div class="text-sm text-green-600">Approved</div>
+            </div>
+            <div class="bg-yellow-100 rounded-lg p-4 text-center">
+              <div class="text-2xl font-bold text-yellow-800">{{ historyStats.submitted }}</div>
+              <div class="text-sm text-yellow-600">Pending Review</div>
+            </div>
+            <div class="bg-red-100 rounded-lg p-4 text-center">
+              <div class="text-2xl font-bold text-red-800">{{ historyStats.rejected }}</div>
+              <div class="text-sm text-red-600">Rejected</div>
+            </div>
+            <div class="bg-gray-100 rounded-lg p-4 text-center">
+              <div class="text-2xl font-bold text-gray-800">{{ historyStats.draft }}</div>
+              <div class="text-sm text-gray-600">Drafts</div>
+            </div>
+          </div>
+
+          <!-- History Entries -->
+          <div *ngIf="filteredHistoryEntries.length > 0" class="space-y-4">
+            <div *ngFor="let entry of filteredHistoryEntries" class="border border-gray-200 rounded-lg p-4">
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center space-x-3">
+                  <span class="text-lg font-medium">{{ formatDate(entry.date) }}</span>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                        [class]="getStatusClass(entry.status)">
+                    {{ entry.status | titlecase }}
+                  </span>
+                </div>
+                <div class="text-right">
+                  <div class="text-lg font-bold text-gray-900">{{ getEntryHours(entry) }}h</div>
+                  <div class="text-sm text-gray-500">
+                    {{ entry.startTime ? entry.startTime + ' - ' + (entry.endTime || 'Active') : 'Manual Entry' }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <p class="text-gray-700">{{ entry.description || 'No description provided' }}</p>
+              </div>
+
+              <!-- Proof of Work Indicator -->
+              <div *ngIf="entry.proofOfWork.length > 0" class="mb-3">
+                <div class="flex items-center space-x-2 text-sm text-gray-600">
+                  <span>📎</span>
+                  <span>{{ entry.proofOfWork.length }} proof(s) of work attached</span>
+                </div>
+              </div>
+
+              <!-- Client Notes (for rejected entries) -->
+              <div *ngIf="entry.status === 'rejected' && entry.clientNotes" 
+                   class="bg-red-50 border border-red-200 rounded-lg p-3 mt-3">
+                <div class="flex items-start space-x-2">
+                  <span class="text-red-600 mt-0.5">💬</span>
+                  <div>
+                    <p class="font-medium text-red-800 text-sm">Feedback from Client:</p>
+                    <p class="text-red-700 text-sm mt-1">{{ entry.clientNotes }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div *ngIf="entry.status === 'draft' || entry.status === 'submitted'" 
+                   class="flex justify-end space-x-2 mt-3 pt-3 border-t border-gray-200">
+                <button *ngIf="entry.status === 'draft' || entry.status === 'submitted'"
+                        (click)="editTimeEntry(entry)"
+                        class="text-ontop-blue hover:text-blue-600 text-sm font-medium">
+                  ✏️ Edit Entry
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div *ngIf="filteredHistoryEntries.length === 0" class="text-center py-8">
+            <span class="text-4xl">📊</span>
+            <h4 class="text-lg font-medium text-gray-900 mt-2">No entries found</h4>
+            <p class="text-gray-600">
+              {{ historyFilter === 'all' ? 'You haven\'t logged any time yet.' : 'No entries match the selected filter.' }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Edit Time Entry Modal -->
+        <div *ngIf="showEditModal && editingEntry" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" 
+             (click)="closeEditModal()">
+          <div class="bg-white rounded-lg max-w-lg w-full mx-4 overflow-hidden" 
+               (click)="$event.stopPropagation()">
+            
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900">Edit Time Entry</h3>
+                <p class="text-sm text-gray-600">{{ formatDate(editingEntry.date) }}</p>
+              </div>
+              <button (click)="closeEditModal()" 
+                      class="text-gray-400 hover:text-gray-600 text-xl font-bold">
+                ✕
+              </button>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="p-6">
+              <form (ngSubmit)="saveEditedEntry()" #editForm="ngForm">
+                
+                <!-- Entry Type Display -->
+                <div class="mb-4">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Entry Type</label>
+                  <div class="flex items-center space-x-2">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                          [class]="editingEntry.startTime ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'">
+                      {{ editingEntry.startTime ? 'Clock In/Out' : 'Manual Entry' }}
+                    </span>
+                    <span class="text-sm text-gray-600">
+                      ({{ editingEntry.startTime ? 'Cannot change clock times' : 'Can edit hours' }})
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Date Field -->
+                <div class="mb-4">
+                  <label for="edit-date" class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                  <input type="date" 
+                         id="edit-date"
+                         [(ngModel)]="editingEntry.date" 
+                         name="date"
+                         required
+                         class="w-full p-3 border border-gray-300 rounded-lg">
+                </div>
+
+                <!-- Hours Field (only for manual entries) -->
+                <div *ngIf="!editingEntry.startTime" class="mb-4">
+                  <label for="edit-hours" class="block text-sm font-medium text-gray-700 mb-2">Hours Worked</label>
+                  <input type="number" 
+                         id="edit-hours"
+                         [(ngModel)]="editingEntry.manualHours" 
+                         name="hours"
+                         min="0.25" 
+                         max="12" 
+                         step="0.25"
+                         required
+                         class="w-full p-3 border border-gray-300 rounded-lg">
+                  <p class="text-xs text-gray-500 mt-1">Between 0.25 and 12 hours</p>
+                </div>
+
+                <!-- Time Display (for clock entries) -->
+                <div *ngIf="editingEntry.startTime" class="mb-4">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Time Period</label>
+                  <div class="bg-gray-50 p-3 rounded-lg">
+                    <p class="text-sm text-gray-800">
+                      {{ editingEntry.startTime }} - {{ editingEntry.endTime || 'Active' }}
+                    </p>
+                    <p class="text-xs text-gray-600 mt-1">
+                      Clock times cannot be edited. Contact your manager if correction is needed.
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Description Field -->
+                <div class="mb-6">
+                  <label for="edit-description" class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                  <textarea id="edit-description"
+                            [(ngModel)]="editingEntry.description" 
+                            name="description"
+                            required
+                            rows="3"
+                            placeholder="Describe what you worked on..."
+                            class="w-full p-3 border border-gray-300 rounded-lg resize-none"></textarea>
+                </div>
+
+                <!-- Proof of Work Display -->
+                <div *ngIf="editingEntry.proofOfWork.length > 0" class="mb-6">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Attached Proof of Work</label>
+                  <div class="space-y-2">
+                    <div *ngFor="let proof of editingEntry.proofOfWork" 
+                         class="flex items-center justify-between bg-gray-50 rounded-lg p-3">
+                      <div class="flex items-center space-x-2">
+                        <span>{{ proof.type === 'screenshot' ? '📷' : proof.type === 'file' ? '📄' : '📝' }}</span>
+                        <span class="text-sm font-medium">{{ proof.fileName || 'Screenshot' }}</span>
+                      </div>
+                      <span class="text-xs text-gray-500">{{ formatTime(proof.timestamp) }}</span>
+                    </div>
+                  </div>
+                  <p class="text-xs text-gray-500 mt-2">
+                    Proof of work cannot be modified after submission. Contact your manager if changes are needed.
+                  </p>
+                </div>
+
+                <!-- Status Warning -->
+                <div *ngIf="editingEntry.status === 'submitted'" class="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                  <div class="flex items-start space-x-2">
+                    <span class="text-yellow-600">⚠️</span>
+                    <div>
+                      <p class="text-sm font-medium text-yellow-800">Entry Already Submitted</p>
+                      <p class="text-xs text-yellow-700 mt-1">
+                        Changes to submitted entries will reset the status to "draft" and require re-submission.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                  <button type="button" 
+                          (click)="closeEditModal()" 
+                          mat-stroked-button>
+                    Cancel
+                  </button>
+                  <button type="submit" 
+                          [disabled]="!editForm.valid || isProcessing"
+                          mat-raised-button color="primary">
+                    {{ isProcessing ? 'Saving...' : 'Save Changes' }}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   `,
@@ -252,9 +611,33 @@ export class WorkerTrackingComponent implements OnInit, OnDestroy {
     description: ''
   };
 
+  // Adjustment request (for clock mode)
+  showAdjustmentForm = false;
+  adjustmentEntry: Partial<TimeEntry> = {
+    date: this.today,
+    manualHours: undefined,
+    description: ''
+  };
+
   // Time entries and proof
   todayEntries: TimeEntry[] = [];
   todayProofOfWork: ProofOfWork[] = [];
+  manualEntryProof: ProofOfWork[] = []; // For timesheet mode
+
+  // History functionality
+  allHistoryEntries: TimeEntry[] = [];
+  filteredHistoryEntries: TimeEntry[] = [];
+  historyFilter: string = 'all';
+  historyStats = {
+    approved: 0,
+    submitted: 0,
+    rejected: 0,
+    draft: 0
+  };
+
+  // Edit functionality
+  showEditModal = false;
+  editingEntry: TimeEntry | null = null;
 
   // Timer
   private timerInterval: any;
@@ -282,7 +665,27 @@ export class WorkerTrackingComponent implements OnInit, OnDestroy {
     this.worker = workers.find(w => w.inviteToken === this.inviteToken) || null;
     
     if (this.worker) {
+      // Activate worker if this is their first time accessing the link
+      if (!this.worker.isActive) {
+        this.worker.isActive = true;
+        this.worker.joinedAt = new Date().toISOString();
+        
+        // Update worker in storage
+        const updatedWorkers = workers.map(w => 
+          w.inviteToken === this.inviteToken ? this.worker! : w
+        );
+        this.storage.saveWorkers(updatedWorkers);
+        
+        // Update client data
+        const clientData = this.storage.getClientData();
+        if (clientData) {
+          clientData.workers = updatedWorkers;
+          this.storage.saveClientData(clientData);
+        }
+      }
+      
       this.loadTodayData();
+      this.loadHistoryData();
       this.checkCurrentSession();
     }
     
@@ -400,7 +803,13 @@ export class WorkerTrackingComponent implements OnInit, OnDestroy {
   }
 
   submitManualEntry() {
-    if (!this.worker || !this.isManualEntryValid()) return;
+    if (!this.worker) return;
+    
+    // For timesheet mode, require proof of work
+    if (this.worker.trackingMode === 'timesheet' && !this.isTimesheetEntryValid()) return;
+    
+    // For clock mode adjustment, use different validation
+    if (this.worker.trackingMode === 'clock' && !this.isManualEntryValid()) return;
 
     const entry: TimeEntry = {
       id: uuidv4(),
@@ -408,7 +817,7 @@ export class WorkerTrackingComponent implements OnInit, OnDestroy {
       date: this.manualEntry.date!,
       manualHours: this.manualEntry.manualHours!,
       description: this.manualEntry.description || '',
-      proofOfWork: [],
+      proofOfWork: this.worker.trackingMode === 'timesheet' ? [...this.manualEntryProof] : [],
       status: 'draft'
     };
 
@@ -422,8 +831,49 @@ export class WorkerTrackingComponent implements OnInit, OnDestroy {
       manualHours: undefined,
       description: ''
     };
+    this.manualEntryProof = [];
 
     this.loadTodayData();
+  }
+
+  // Adjustment request methods (for clock mode)
+  requestAdjustment() {
+    this.showAdjustmentForm = true;
+    this.adjustmentEntry = {
+      date: this.today,
+      manualHours: undefined,
+      description: ''
+    };
+  }
+
+  submitAdjustment() {
+    if (!this.worker || !this.isAdjustmentEntryValid()) return;
+
+    const entry: TimeEntry = {
+      id: uuidv4(),
+      workerId: this.worker.contractorId,
+      date: this.adjustmentEntry.date!,
+      manualHours: this.adjustmentEntry.manualHours!,
+      description: this.adjustmentEntry.description || '',
+      proofOfWork: [],
+      status: 'submitted' // Adjustment requests go directly to submitted status
+    };
+
+    const timeEntries = this.storage.getTimeEntries();
+    timeEntries.push(entry);
+    this.storage.saveTimeEntries(timeEntries);
+
+    this.cancelAdjustment();
+    this.loadTodayData();
+  }
+
+  cancelAdjustment() {
+    this.showAdjustmentForm = false;
+    this.adjustmentEntry = {
+      date: this.today,
+      manualHours: undefined,
+      description: ''
+    };
   }
 
   async captureScreenshot() {
@@ -457,7 +907,11 @@ export class WorkerTrackingComponent implements OnInit, OnDestroy {
           return;
         }
 
-        this.addProofOfWork('screenshot', base64, 'Screenshot');
+        if (this.worker?.trackingMode === 'timesheet') {
+          this.addManualEntryProof('screenshot', base64, 'Screenshot');
+        } else {
+          this.addProofOfWork('screenshot', base64, 'Screenshot');
+        }
         this.isProcessing = false;
       };
     } catch (error) {
@@ -477,7 +931,11 @@ export class WorkerTrackingComponent implements OnInit, OnDestroy {
 
     const reader = new FileReader();
     reader.onload = (e) => {
-      this.addProofOfWork('file', e.target?.result as string, file.name, file.size);
+      if (this.worker?.trackingMode === 'timesheet') {
+        this.addManualEntryProof('file', e.target?.result as string, file.name, file.size);
+      } else {
+        this.addProofOfWork('file', e.target?.result as string, file.name, file.size);
+      }
     };
     reader.readAsDataURL(file);
   }
@@ -577,4 +1035,139 @@ export class WorkerTrackingComponent implements OnInit, OnDestroy {
       this.manualEntry.description?.trim()
     );
   }
+
+  isTimesheetEntryValid(): boolean {
+    return !!(
+      this.manualEntry.date &&
+      this.manualEntry.manualHours &&
+      this.manualEntry.manualHours >= 0.25 &&
+      this.manualEntry.manualHours <= 12 &&
+      this.manualEntry.description?.trim() &&
+      this.manualEntryProof.length > 0
+    );
+  }
+
+  isAdjustmentEntryValid(): boolean {
+    return !!(
+      this.adjustmentEntry.date &&
+      this.adjustmentEntry.manualHours &&
+      this.adjustmentEntry.manualHours >= 0.25 &&
+      this.adjustmentEntry.manualHours <= 12 &&
+      this.adjustmentEntry.description?.trim()
+    );
+  }
+
+  addManualEntryProof(type: 'screenshot' | 'file', content: string, fileName?: string, fileSize?: number) {
+    const proof: ProofOfWork = {
+      id: uuidv4(),
+      type,
+      timestamp: new Date().toISOString(),
+      content,
+      fileName,
+      fileSize
+    };
+
+    this.manualEntryProof.push(proof);
+  }
+
+  removeManualEntryProof(proofId: string) {
+    this.manualEntryProof = this.manualEntryProof.filter(p => p.id !== proofId);
+  }
+
+  // History functionality methods
+  loadHistoryData() {
+    const allEntries = this.storage.getTimeEntries();
+    this.allHistoryEntries = allEntries
+      .filter(entry => entry.workerId === this.worker?.contractorId)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()); // Sort by date desc
+    
+    this.updateHistoryStats();
+    this.filterHistory();
+  }
+
+  updateHistoryStats() {
+    this.historyStats = {
+      approved: this.allHistoryEntries.filter(e => e.status === 'approved').length,
+      submitted: this.allHistoryEntries.filter(e => e.status === 'submitted').length,
+      rejected: this.allHistoryEntries.filter(e => e.status === 'rejected').length,
+      draft: this.allHistoryEntries.filter(e => e.status === 'draft').length
+    };
+  }
+
+  filterHistory() {
+    if (this.historyFilter === 'all') {
+      this.filteredHistoryEntries = [...this.allHistoryEntries];
+    } else {
+      this.filteredHistoryEntries = this.allHistoryEntries.filter(
+        entry => entry.status === this.historyFilter
+      );
+    }
+  }
+
+  formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      weekday: 'short',
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    });
+  }
+
+  editTimeEntry(entry: TimeEntry) {
+    this.editingEntry = { ...entry }; // Create a copy for editing
+    this.showEditModal = true;
+  }
+
+  closeEditModal() {
+    this.showEditModal = false;
+    this.editingEntry = null;
+  }
+
+  saveEditedEntry() {
+    if (!this.editingEntry || !this.worker) return;
+
+    this.isProcessing = true;
+
+    try {
+      // If the entry was previously submitted, reset to draft status
+      if (this.editingEntry.status === 'submitted') {
+        this.editingEntry.status = 'draft';
+      }
+
+      // Update the entry in storage
+      const allEntries = this.storage.getTimeEntries();
+      const entryIndex = allEntries.findIndex(e => e.id === this.editingEntry!.id);
+      
+      if (entryIndex !== -1) {
+        allEntries[entryIndex] = this.editingEntry;
+        this.storage.saveWorkers([]);
+        this.storage.saveWorkers([]);
+        
+        // Save updated entries
+        this.storage.updateTimeEntry(this.editingEntry);
+        
+        // Refresh data
+        this.loadTodayData();
+        this.loadHistoryData();
+        
+        this.closeEditModal();
+        
+        // Show success message briefly
+        this.errorMessage = '';
+        const originalProcessing = this.isProcessing;
+        this.isProcessing = false;
+        
+        // Could add a success toast here
+        console.log('Time entry updated successfully');
+      } else {
+        throw new Error('Entry not found');
+      }
+    } catch (error: any) {
+      this.errorMessage = error.message || 'Failed to update time entry';
+    } finally {
+      this.isProcessing = false;
+    }
+  }
+
 }

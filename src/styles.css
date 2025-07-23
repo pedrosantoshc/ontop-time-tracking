@@ -1,4 +1,10 @@
-/* Ontop Time Tracking MVP Styles */
+/* Ontop Time Tracking - Design System Integration */
+
+/* Import design system files in correct order */
+@import './styles/design-tokens.scss';
+@import './styles/layout.scss';
+@import './styles/typography.scss';
+@import './styles/utilities.scss';
 
 /* Reset and base styles */
 * {
@@ -7,18 +13,132 @@
   box-sizing: border-box;
 }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  line-height: 1.6;
-  color: #1f2937;
-  background-color: #f8fafc;
+html {
+  height: 100%;
+  scroll-behavior: smooth;
 }
 
-/* Ontop color variables */
+body {
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+  background-color: var(--color-background-secondary);
+  margin: 0;
+  height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Legacy compatibility variables - these will be deprecated */
 :root {
-  --ontop-blue: #4F46E5;
-  --ontop-red: #EF4444;
-  --ontop-gray: #F8FAFC;
+  /* Legacy Ontop variables for backward compatibility */
+  --ontop-pink: var(--color-primary-500);
+  --ontop-dark: var(--color-secondary-900);
+  --ontop-white: var(--color-background-primary);
+  --ontop-gray: var(--color-background-secondary);
+  --ontop-red: var(--color-error-500);
+}
+
+/* Material theme colors are now handled by ontop-theme.scss */
+
+/* Material Layout Utilities */
+.flex-spacer {
+  flex: 1 1 auto;
+}
+
+.mr-1 { margin-right: 4px; }
+.mr-2 { margin-right: 8px; }
+.mr-3 { margin-right: 12px; }
+.ml-2 { margin-left: 8px; }
+.mb-3 { margin-bottom: 12px; }
+.mt-2 { margin-top: 8px; }
+.p-6 { padding: 24px; }
+.opacity-80 { opacity: 0.8; }
+.min-w-40 { min-width: 160px; }
+
+/* Color utilities for Material components */
+.text-primary { color: var(--color-primary-500); }
+.text-orange-600 { color: var(--color-warning-600); }
+.text-blue-600 { color: var(--color-info-600); }
+.bg-primary { background-color: var(--color-primary-500); }
+
+/* Material Table Styling */
+.mat-mdc-table {
+  background: var(--color-background-primary);
+}
+
+.mat-mdc-header-cell {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.mat-mdc-cell {
+  border-bottom-color: var(--color-neutral-200);
+}
+
+.mat-mdc-row:hover {
+  background-color: var(--color-neutral-50);
+}
+
+/* Material Chip Styling */
+.mat-mdc-chip {
+  font-size: 12px;
+  min-height: 24px;
+}
+
+/* Custom width for table */
+.w-10 { width: 2.5rem; }
+.h-10 { height: 2.5rem; }
+.space-x-3 > * + * { margin-left: 0.75rem; }
+.space-y-2 > * + * { margin-top: 0.5rem; }
+.space-y-3 > * + * { margin-top: 0.75rem; }
+.py-12 { padding-top: 3rem; padding-bottom: 3rem; }
+.pb-4 { padding-bottom: 1rem; }
+.gap-3 { gap: 0.75rem; }
+.gap-8 { gap: 2rem; }
+.pt-4 { padding-top: 1rem; }
+.max-h-48 { max-height: 12rem; }
+
+/* Material Checkbox Fixes */
+.mat-mdc-checkbox {
+  margin-right: 8px;
+}
+
+.mat-mdc-checkbox .mdc-checkbox {
+  padding: 4px;
+}
+
+/* Material Button Fixes */
+.mat-mdc-stroked-button {
+  min-width: auto;
+  padding: 4px 8px;
+}
+
+/* Material Form Field Improvements */
+.mat-mdc-form-field {
+  width: 100%;
+}
+
+.mat-mdc-form-field .mat-mdc-form-field-flex {
+  align-items: center;
+}
+
+/* Status chip improvements */
+.mat-mdc-chip {
+  margin: 0;
+}
+
+/* Enhanced Material Card Styling */
+.stat-card {
+  transition: var(--transition-all);
+  cursor: pointer;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--elevation-3);
 }
 
 /* Utility classes matching Tailwind patterns */
@@ -71,57 +191,46 @@ body {
 .relative { position: relative; }
 .resize-none { resize: none; }
 
-/* Text styles */
-.text-6xl { font-size: 3.75rem; }
-.text-4xl { font-size: 2.25rem; }
-.text-2xl { font-size: 1.5rem; }
-.text-xl { font-size: 1.25rem; }
-.text-lg { font-size: 1.125rem; }
-.text-sm { font-size: 0.875rem; }
-.text-xs { font-size: 0.75rem; }
-.font-bold { font-weight: 700; }
-.font-semibold { font-weight: 600; }
-.font-medium { font-weight: 500; }
-.font-mono { font-family: ui-monospace, SFMono-Regular, 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace; }
-.text-white { color: #ffffff; }
-.text-gray-900 { color: #111827; }
-.text-gray-800 { color: #1f2937; }
-.text-gray-700 { color: #374151; }
-.text-gray-600 { color: #4b5563; }
-.text-gray-500 { color: #6b7280; }
-.text-gray-400 { color: #9ca3af; }
-.text-red-800 { color: #991b1b; }
-.text-red-600 { color: #dc2626; }
-.text-green-800 { color: #166534; }
-.text-green-600 { color: #16a34a; }
-.text-yellow-800 { color: #92400e; }
-.text-ontop-blue { color: var(--ontop-blue); }
-.text-ontop-red { color: var(--ontop-red); }
+/* Legacy text styles - many of these are now in design system */
+.text-white { color: var(--color-background-primary); }
+.text-gray-900 { color: var(--color-neutral-900); }
+.text-gray-800 { color: var(--color-neutral-800); }
+.text-gray-700 { color: var(--color-neutral-700); }
+.text-gray-600 { color: var(--color-neutral-600); }
+.text-gray-500 { color: var(--color-neutral-500); }
+.text-gray-400 { color: var(--color-neutral-400); }
+.text-red-800 { color: var(--color-error-800); }
+.text-red-600 { color: var(--color-error-600); }
+.text-green-800 { color: var(--color-success-800); }
+.text-green-600 { color: var(--color-success-600); }
+.text-yellow-800 { color: var(--color-warning-800); }
+.text-ontop-pink { color: var(--color-primary-500); }
+.text-ontop-red { color: var(--color-error-500); }
 
-/* Colors */
-.bg-white { background-color: #ffffff; }
-.bg-gray-50 { background-color: #f9fafb; }
-.bg-gray-100 { background-color: #f3f4f6; }
-.bg-gray-200 { background-color: #e5e7eb; }
-.bg-red-50 { background-color: #fef2f2; }
-.bg-green-50 { background-color: #f0fdf4; }
-.bg-green-100 { background-color: #dcfce7; }
-.bg-red-100 { background-color: #fee2e2; }
-.bg-yellow-100 { background-color: #fef3c7; }
-.bg-ontop-blue { background-color: var(--ontop-blue); }
-.bg-ontop-gray { background-color: var(--ontop-gray); }
+/* Legacy background colors - many now available in design system */
+.bg-white { background-color: var(--color-background-primary); }
+.bg-gray-50 { background-color: var(--color-neutral-50); }
+.bg-gray-100 { background-color: var(--color-neutral-100); }
+.bg-gray-200 { background-color: var(--color-neutral-200); }
+.bg-red-50 { background-color: var(--color-error-50); }
+.bg-green-50 { background-color: var(--color-success-50); }
+.bg-green-100 { background-color: var(--color-success-100); }
+.bg-red-100 { background-color: var(--color-error-100); }
+.bg-yellow-100 { background-color: var(--color-warning-100); }
+.bg-ontop-pink { background-color: var(--color-primary-500); }
+.bg-ontop-gray { background-color: var(--color-background-secondary); }
 
-/* Borders */
-.border { border: 1px solid #e5e7eb; }
-.border-2 { border: 2px solid; }
-.border-t { border-top: 1px solid #e5e7eb; }
+/* Legacy border utilities - many now available in design system */
+.border { border: 1px solid var(--color-neutral-200); }
+.border-2 { border: 2px solid var(--color-neutral-200); }
+.border-t { border-top: 1px solid var(--color-neutral-200); }
 .border-dashed { border-style: dashed; }
-.border-gray-200 { border-color: #e5e7eb; }
-.border-gray-300 { border-color: #d1d5db; }
-.border-red-200 { border-color: #fecaca; }
-.border-green-200 { border-color: #bbf7d0; }
-.border-ontop-blue { border-color: var(--ontop-blue); }
-.border-b { border-bottom: 1px solid #e5e7eb; }
+.border-gray-200 { border-color: var(--color-neutral-200); }
+.border-gray-300 { border-color: var(--color-neutral-300); }
+.border-red-200 { border-color: var(--color-error-200); }
+.border-green-200 { border-color: var(--color-success-200); }
+.border-ontop-pink { border-color: var(--color-primary-500); }
+.border-b { border-bottom: 1px solid var(--color-neutral-200); }
 .rounded-lg { border-radius: 0.5rem; }
 .rounded-full { border-radius: 9999px; }
 
@@ -137,104 +246,73 @@ textarea {
 
 /* Responsive design */
 @media (min-width: 768px) {
-  .md\\:grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+  .md\:grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (min-width: 1024px) {
-  .lg\\:grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+  .lg\:grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
 }
 
-/* Shadows */
-.shadow-sm { box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); }
+/* Legacy shadow utilities - prefer design system elevation */
+.shadow-sm { box-shadow: var(--elevation-1); }
 
-/* Ontop-specific component styles */
-.btn-ontop-primary {
-  background-color: var(--ontop-blue);
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  border: none;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.2s ease;
-}
-
-.btn-ontop-primary:hover {
-  background-color: #3730a3;
-}
-
-.btn-ontop-primary:disabled {
-  background-color: #9ca3af;
-  cursor: not-allowed;
-}
-
-.btn-ontop-secondary {
-  background-color: #e5e7eb;
-  color: #374151;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  border: none;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.2s ease;
-}
-
-.btn-ontop-secondary:hover {
-  background-color: #d1d5db;
-}
+/* Legacy .btn-ontop-* styles removed in favour of Material buttons */
 
 .card-ontop {
-  background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  border: 1px solid #e5e7eb;
-  padding: 1.5rem;
+  background-color: var(--color-background-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--elevation-1);
+  border: 1px solid var(--color-neutral-200);
+  padding: var(--spacing-xl);
 }
 
-/* Table styles */
+/* Legacy table styles - prefer design system classes */
 table {
   width: 100%;
   border-collapse: collapse;
 }
 
 th, td {
-  padding: 0.75rem 1rem;
+  padding: var(--table-cell-padding-y) var(--table-cell-padding-x);
   text-align: left;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--color-neutral-200);
 }
 
 th {
-  font-weight: 500;
-  color: #111827;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
 }
 
 tr:hover {
-  background-color: #f9fafb;
+  background-color: var(--color-neutral-50);
 }
 
-/* Status badges */
+/* Status badges - prefer design system chip components */
 .inline-flex {
   display: inline-flex;
   align-items: center;
-  padding: 0.125rem 0.625rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 500;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
 }
 
-.bg-green-100 {
-  background-color: #dcfce7;
-}
+/* Legacy hover effects - prefer design system utilities */
+.hover\:bg-gray-50:hover { background-color: var(--color-neutral-50); }
+.hover\:text-blue-600:hover { color: var(--color-info-600); }
+.hover\:text-red-600:hover { color: var(--color-error-600); }
 
-.text-green-800 {
-  color: #166534;
-}
-
-/* Hover effects */
-.hover\:bg-gray-50:hover { background-color: #f9fafb; }
-.hover\:text-blue-600:hover { color: #2563eb; }
-.hover\:text-red-600:hover { color: #dc2626; }
-
-/* Interactive elements */
+/* Legacy interactive utilities - prefer design system classes */
 .cursor-pointer { cursor: pointer; }
-.transition-colors { transition: color 0.2s ease; }
+.transition-colors { transition: var(--transition-colors); }
+
+/* Z-index utilities */
+.z-50 { z-index: 50; }
+.z-60 { z-index: 60; }
+
+/* Modal and positioning */
+.fixed { position: fixed; }
+.inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+.object-contain { object-fit: contain; }
+
+/* Material theme handles html/body styling */

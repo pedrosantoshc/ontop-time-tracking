@@ -5,11 +5,14 @@ import { Router } from '@angular/router';
 import { CsvImportService } from '../../services/csv-import.service';
 import { StorageService } from '../../services/storage.service';
 import { Client, Worker } from '../../models/interfaces';
+// Angular Material
+import { MatButtonModule } from '@angular/material/button';
+import { ButtonComponent } from '../shared/button/button.component';
 
 @Component({
   selector: 'app-client-setup',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatButtonModule, ButtonComponent],
   template: `
     <div class="min-h-screen bg-ontop-gray p-4">
       <div class="max-w-4xl mx-auto">
@@ -49,7 +52,7 @@ import { Client, Worker } from '../../models/interfaces';
                      (change)="onFileSelected($event)" 
                      class="hidden" 
                      #fileInput>
-              <button (click)="fileInput.click()" class="btn-ontop-primary">
+              <button mat-raised-button color="primary" (click)="fileInput.click()">
                 Browse Files
               </button>
             </div>
@@ -68,9 +71,9 @@ import { Client, Worker } from '../../models/interfaces';
                 </button>
               </div>
               
-              <button (click)="processFile()" 
+              <button mat-raised-button color="primary" (click)="processFile()" 
                       [disabled]="isProcessing" 
-                      class="btn-ontop-primary w-full mt-4">
+                      class="w-full mt-4">
                 <span *ngIf="!isProcessing">Process File</span>
                 <span *ngIf="isProcessing">Processing...</span>
               </button>
@@ -96,11 +99,24 @@ import { Client, Worker } from '../../models/interfaces';
 
         <!-- Workers List -->
         <div *ngIf="workers.length > 0" class="card-ontop">
-          <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-semibold">Imported Hourly Workers ({{ workers.length }})</h3>
-            <button (click)="proceedToDashboard()" class="btn-ontop-primary">
+            <button mat-raised-button color="primary" (click)="proceedToDashboard()">
               Continue to Dashboard
             </button>
+          </div>
+
+          <!-- Tracking Mode Explanation -->
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <h4 class="font-medium text-blue-900 mb-2">📋 Choose Tracking Mode for Each Worker</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-blue-800">
+              <div>
+                <span class="font-medium">⏰ Clock In/Out:</span> Workers use start/stop buttons with optional time adjustment requests
+              </div>
+              <div>
+                <span class="font-medium">📊 Timesheet:</span> Workers report daily hours manually with required proof of work
+              </div>
+            </div>
           </div>
 
           <div class="overflow-x-auto">
@@ -110,25 +126,49 @@ import { Client, Worker } from '../../models/interfaces';
                   <th class="text-left py-3 px-4 font-medium text-gray-900">Name</th>
                   <th class="text-left py-3 px-4 font-medium text-gray-900">Email</th>
                   <th class="text-left py-3 px-4 font-medium text-gray-900">Contractor ID</th>
+                  <th class="text-left py-3 px-4 font-medium text-gray-900">Tracking Mode</th>
                   <th class="text-left py-3 px-4 font-medium text-gray-900">Invite Link</th>
                   <th class="text-left py-3 px-4 font-medium text-gray-900">Status</th>
                 </tr>
               </thead>
               <tbody>
                 <tr *ngFor="let worker of workers" class="border-b border-gray-100 hover:bg-gray-50">
-                  <td class="py-3 px-4">{{ worker.name }}</td>
-                  <td class="py-3 px-4 text-gray-600">{{ worker.email }}</td>
-                  <td class="py-3 px-4 text-gray-600">{{ worker.contractorId }}</td>
                   <td class="py-3 px-4">
-                    <button (click)="copyInviteLink(worker.inviteToken)" 
-                            class="text-ontop-blue hover:text-blue-600 text-sm">
-                      Copy Link
-                    </button>
+                    <div class="flex items-center space-x-2">
+                      <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                        <span class="text-xs font-medium">{{ getWorkerInitials(worker.name) }}</span>
+                      </div>
+                      <span class="font-medium">{{ worker.name }}</span>
+                    </div>
+                  </td>
+                  <td class="py-3 px-4 text-gray-600">{{ worker.email }}</td>
+                  <td class="py-3 px-4 text-gray-600 font-mono">{{ worker.contractorId }}</td>
+                  <td class="py-3 px-4">
+                    <select 
+                      [(ngModel)]="worker.trackingMode"
+                      (ngModelChange)="updateWorkerTrackingMode(worker)"
+                      class="p-2 border border-gray-300 rounded-lg text-sm w-full">
+                      <option value="clock">Clock In/Out</option>
+                      <option value="timesheet">Timesheet</option>
+                    </select>
                   </td>
                   <td class="py-3 px-4">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      Active
+                    <app-button 
+                      variant="secondary" 
+                      size="small" 
+                      icon="link" 
+                      (click)="copyInviteLink(worker.inviteToken)">
+                      Copy Link
+                    </app-button>
+                  </td>
+                  <td class="py-3 px-4">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                          [class]="worker.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'">
+                      {{ worker.isActive ? 'Active' : 'Invited' }}
                     </span>
+                    <div *ngIf="worker.joinedAt" class="text-xs text-gray-500 mt-1">
+                      Joined: {{ formatDate(worker.joinedAt) }}
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -209,19 +249,25 @@ export class ClientSetupComponent {
       // Save to storage
       this.storage.saveWorkers(this.workers);
       
-      // Create client data
-      const clientData: Client = {
-        id: 'client_' + Date.now(),
-        name: 'Company Client',
-        email: 'client@company.com',
-        trackingPreferences: {
-          allowClockInOut: true,
-          allowManualEntry: true,
-          requireProofOfWork: true,
-          screenshotFrequency: 'manual'
-        },
-        workers: this.workers
-      };
+      // Create client data (only if it doesn't exist)
+      let clientData = this.storage.getClientData();
+      if (!clientData) {
+        clientData = {
+          id: 'client_' + Date.now(),
+          name: 'Company Client',
+          email: 'client@company.com',
+          trackingPreferences: {
+            allowClockInOut: true,
+            allowManualEntry: true,
+            requireProofOfWork: true,
+            screenshotFrequency: 'manual'
+          },
+          workers: this.workers
+        };
+      } else {
+        // Update existing client data with new workers
+        clientData.workers = [...(clientData.workers || []), ...this.workers];
+      }
       this.storage.saveClientData(clientData);
 
       this.successMessage = `Successfully imported ${this.workers.length} hourly workers!`;
@@ -247,6 +293,26 @@ export class ClientSetupComponent {
     const sizes = ['Bytes', 'KB', 'MB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+
+  updateWorkerTrackingMode(worker: Worker) {
+    // Update the worker in storage immediately
+    this.storage.saveWorkers(this.workers);
+    
+    // Update client data
+    const clientData = this.storage.getClientData();
+    if (clientData) {
+      clientData.workers = this.workers;
+      this.storage.saveClientData(clientData);
+    }
+  }
+
+  getWorkerInitials(name: string): string {
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+  }
+
+  formatDate(dateString: string): string {
+    return new Date(dateString).toLocaleDateString();
   }
 
   proceedToDashboard() {

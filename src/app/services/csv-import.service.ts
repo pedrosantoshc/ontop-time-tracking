@@ -46,17 +46,85 @@ export class CsvImportService {
       const unitOfPayment = row[12]?.toLowerCase().trim();
       
       if (unitOfPayment === 'per hour') {
+        // Enhanced validation for contractor data
+        const contractorId = row[0]?.trim() || '';
+        const name = row[3]?.trim() || '';
+        const email = row[4]?.trim() || '';
+        
+        // Skip invalid rows with missing critical data
+        if (!contractorId || !name || contractorId === 'Unknown' || name === 'Unknown') {
+          console.warn('Skipping invalid contractor row:', { contractorId, name, email });
+          continue;
+        }
+        
+        // Ensure contractor ID is clean and valid
+        const cleanContractorId = contractorId.replace(/[^\w\-]/g, '');
+        if (!cleanContractorId) {
+          console.warn('Skipping contractor with invalid ID:', contractorId);
+          continue;
+        }
+        
         workers.push({
-          contractorId: row[0] || `temp_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
-          name: row[3] || 'Unknown',
-          email: row[4] || '',
+          contractorId: cleanContractorId,
+          name: name,
+          email: email,
           inviteToken: this.generateInviteToken(),
-          isActive: true
+          isActive: false, // Workers start inactive and become active when they access their link
+          trackingMode: 'clock' // Default to clock in/out mode
         });
       }
     }
     
-    return workers;
+    // Final validation and deduplication
+    const validatedWorkers = this.validateAndCleanWorkers(workers);
+    
+    if (validatedWorkers.length === 0) {
+      throw new Error('No valid hourly workers found in the file. Please check data format.');
+    }
+    
+    console.log(`Successfully imported ${validatedWorkers.length} hourly workers`);
+    return validatedWorkers;
+  }
+
+  /**
+   * Validate and clean worker data to prevent issues
+   */
+  private validateAndCleanWorkers(workers: Worker[]): Worker[] {
+    const seenIds = new Set<string>();
+    const validWorkers: Worker[] = [];
+    
+    for (const worker of workers) {
+      // Check for duplicate contractor IDs
+      if (seenIds.has(worker.contractorId)) {
+        console.warn('Duplicate contractor ID found, skipping:', worker.contractorId);
+        continue;
+      }
+      
+      // Final validation
+      if (this.isValidWorker(worker)) {
+        seenIds.add(worker.contractorId);
+        validWorkers.push(worker);
+      } else {
+        console.warn('Invalid worker data, skipping:', worker);
+      }
+    }
+    
+    return validWorkers;
+  }
+
+  /**
+   * Check if worker data is valid
+   */
+  private isValidWorker(worker: Worker): boolean {
+    return !!(
+      worker.contractorId && 
+      worker.name && 
+      worker.contractorId.trim().length > 0 && 
+      worker.name.trim().length > 0 &&
+      worker.name !== 'Unknown' &&
+      worker.contractorId !== 'Unknown' &&
+      /^[\w\-]+$/.test(worker.contractorId) // Only allow alphanumeric and hyphens
+    );
   }
 
   // Legacy method for backward compatibility

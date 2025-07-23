@@ -16,7 +16,9 @@ export interface Worker {
   name: string;
   email: string;
   inviteToken: string;
-  isActive: boolean;
+  isActive: boolean; // false initially, becomes true when they access their invite link
+  trackingMode: 'clock' | 'timesheet'; // 'clock' = clock in/out, 'timesheet' = manual hours with proof
+  joinedAt?: string; // timestamp when they first accessed their invite link
 }
 
 export interface TimeEntry {
