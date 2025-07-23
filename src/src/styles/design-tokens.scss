@@ -1,0 +1,319 @@
+/**
+ * Ontop Design System - Design Tokens
+ * 
+ * This file defines the foundational design tokens for the Ontop Time Tracking application.
+ * These tokens ensure consistency across all components and enable systematic theming.
+ */
+
+// ============================================================================
+// SPACING SCALE
+// ============================================================================
+// Based on 4px grid system for consistent spacing throughout the application
+
+:root {
+  // Base spacing unit
+  --spacing-base: 4px;
+  
+  // Spacing scale
+  --spacing-xs: calc(var(--spacing-base) * 1);    // 4px
+  --spacing-sm: calc(var(--spacing-base) * 2);    // 8px
+  --spacing-md: calc(var(--spacing-base) * 3);    // 12px
+  --spacing-lg: calc(var(--spacing-base) * 4);    // 16px
+  --spacing-xl: calc(var(--spacing-base) * 6);    // 24px
+  --spacing-2xl: calc(var(--spacing-base) * 8);   // 32px
+  --spacing-3xl: calc(var(--spacing-base) * 12);  // 48px
+  --spacing-4xl: calc(var(--spacing-base) * 16);  // 64px
+  --spacing-5xl: calc(var(--spacing-base) * 20);  // 80px
+  --spacing-6xl: calc(var(--spacing-base) * 24);  // 96px
+}
+
+// ============================================================================
+// TYPOGRAPHY HIERARCHY
+// ============================================================================
+// Systematic typography scale for consistent text styling
+
+:root {
+  // Font families
+  --font-family-primary: 'Roboto', 'Helvetica Neue', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-family-mono: 'Roboto Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  
+  // Font weights
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  // Font sizes
+  --font-size-xs: 0.75rem;    // 12px
+  --font-size-sm: 0.875rem;   // 14px
+  --font-size-base: 1rem;     // 16px
+  --font-size-lg: 1.125rem;   // 18px
+  --font-size-xl: 1.25rem;    // 20px
+  --font-size-2xl: 1.5rem;    // 24px
+  --font-size-3xl: 1.875rem;  // 30px
+  --font-size-4xl: 2.25rem;   // 36px
+  --font-size-5xl: 3rem;      // 48px
+  --font-size-6xl: 3.75rem;   // 60px
+  
+  // Line heights
+  --line-height-tight: 1.25;
+  --line-height-snug: 1.375;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+  --line-height-loose: 2;
+}
+
+// ============================================================================
+// COLOR PALETTE
+// ============================================================================
+// Extended color system based on Ontop brand colors
+
+:root {
+  // Primary Colors (Ontop Pink - Wild Watermelon)
+  --color-primary-50: #fff0f2;
+  --color-primary-100: #ffdde2;
+  --color-primary-200: #ffc1cb;
+  --color-primary-300: #ff95a6;
+  --color-primary-400: #ff6b82;
+  --color-primary-500: #ff5a70;  /* Main Ontop Pink */
+  --color-primary-600: #f63354;
+  --color-primary-700: #e01e3e;
+  --color-primary-800: #bc1b35;
+  --color-primary-900: #a01b33;
+  
+  // Secondary Colors (Ontop Dark - Mine Shaft)
+  --color-secondary-50: #f8f8f8;
+  --color-secondary-100: #f0f0f0;
+  --color-secondary-200: #e4e4e4;
+  --color-secondary-300: #d1d1d1;
+  --color-secondary-400: #b4b4b4;
+  --color-secondary-500: #9a9a9a;
+  --color-secondary-600: #818181;
+  --color-secondary-700: #6a6a6a;
+  --color-secondary-800: #444444;
+  --color-secondary-900: #222222;  /* Main Ontop Dark */
+  
+  // Semantic Colors
+  // Success (Green)
+  --color-success-50: #f0fdf4;
+  --color-success-100: #dcfce7;
+  --color-success-200: #bbf7d0;
+  --color-success-300: #86efac;
+  --color-success-400: #4ade80;
+  --color-success-500: #22c55e;
+  --color-success-600: #16a34a;
+  --color-success-700: #15803d;
+  --color-success-800: #166534;
+  --color-success-900: #14532d;
+  
+  // Warning (Amber)
+  --color-warning-50: #fffbeb;
+  --color-warning-100: #fef3c7;
+  --color-warning-200: #fde68a;
+  --color-warning-300: #fcd34d;
+  --color-warning-400: #fbbf24;
+  --color-warning-500: #f59e0b;
+  --color-warning-600: #d97706;
+  --color-warning-700: #b45309;
+  --color-warning-800: #92400e;
+  --color-warning-900: #78350f;
+  
+  // Error (Red)
+  --color-error-50: #fef2f2;
+  --color-error-100: #fee2e2;
+  --color-error-200: #fecaca;
+  --color-error-300: #fca5a5;
+  --color-error-400: #f87171;
+  --color-error-500: #ef4444;
+  --color-error-600: #dc2626;
+  --color-error-700: #b91c1c;
+  --color-error-800: #991b1b;
+  --color-error-900: #7f1d1d;
+  
+  // Info (Blue)
+  --color-info-50: #eff6ff;
+  --color-info-100: #dbeafe;
+  --color-info-200: #bfdbfe;
+  --color-info-300: #93c5fd;
+  --color-info-400: #60a5fa;
+  --color-info-500: #3b82f6;
+  --color-info-600: #2563eb;
+  --color-info-700: #1d4ed8;
+  --color-info-800: #1e40af;
+  --color-info-900: #1e3a8a;
+  
+  // Neutral Colors (Extended Gray Scale)
+  --color-neutral-50: #fafafa;
+  --color-neutral-100: #f5f5f5;
+  --color-neutral-200: #e5e5e5;
+  --color-neutral-300: #d4d4d4;
+  --color-neutral-400: #a3a3a3;
+  --color-neutral-500: #737373;
+  --color-neutral-600: #525252;
+  --color-neutral-700: #404040;
+  --color-neutral-800: #262626;
+  --color-neutral-900: #171717;
+  
+  // Background Colors
+  --color-background: #ffffff;
+  --color-background-primary: #ffffff;
+  --color-background-secondary: #f8fafc;
+  --color-background-tertiary: #f1f5f9;
+  --color-background-subtle: #f8fafc;
+  --color-background-hover: #f1f5f9;
+  --color-background-overlay: rgba(0, 0, 0, 0.5);
+  
+  // Text Colors
+  --color-text-primary: #1f2937;
+  --color-text-secondary: #4b5563;
+  --color-text-tertiary: #6b7280;
+  --color-text-muted: #9ca3af;
+  --color-text-disabled: #9ca3af;
+  --color-text-inverse: #ffffff;
+  
+  // Border Colors
+  --color-border-light: #e5e7eb;
+  --color-border: #d1d5db;
+  --color-border-dark: #9ca3af;
+}
+
+// ============================================================================
+// ELEVATION SYSTEM
+// ============================================================================
+// Consistent shadow system for layering and depth
+
+:root {
+  // Elevation levels (8 levels)
+  --elevation-0: none;
+  --elevation-1: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --elevation-2: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --elevation-3: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --elevation-4: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --elevation-5: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --elevation-6: 0 32px 64px -12px rgba(0, 0, 0, 0.4);
+  --elevation-7: 0 40px 80px -12px rgba(0, 0, 0, 0.5);
+  
+  // Special shadows
+  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+  --shadow-outline: 0 0 0 3px rgba(255, 90, 112, 0.1);
+  --shadow-focus: 0 0 0 3px rgba(255, 90, 112, 0.2);
+}
+
+// ============================================================================
+// BORDER RADIUS
+// ============================================================================
+// Consistent border radius scale
+
+:root {
+  --radius-none: 0;
+  --radius-sm: 0.125rem;    // 2px
+  --radius-base: 0.25rem;   // 4px
+  --radius-md: 0.375rem;    // 6px
+  --radius-lg: 0.5rem;      // 8px
+  --radius-xl: 0.75rem;     // 12px
+  --radius-2xl: 1rem;       // 16px
+  --radius-3xl: 1.5rem;     // 24px
+  --radius-full: 9999px;
+}
+
+// ============================================================================
+// TRANSITIONS & ANIMATIONS
+// ============================================================================
+// Consistent timing and easing functions
+
+:root {
+  // Duration
+  --duration-75: 75ms;
+  --duration-100: 100ms;
+  --duration-150: 150ms;
+  --duration-200: 200ms;
+  --duration-300: 300ms;
+  --duration-500: 500ms;
+  --duration-700: 700ms;
+  --duration-1000: 1000ms;
+  
+  // Easing functions
+  --ease-linear: linear;
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  
+  // Common transitions
+  --transition-colors: color var(--duration-150) var(--ease-in-out), 
+                       background-color var(--duration-150) var(--ease-in-out), 
+                       border-color var(--duration-150) var(--ease-in-out);
+  --transition-opacity: opacity var(--duration-150) var(--ease-in-out);
+  --transition-transform: transform var(--duration-150) var(--ease-in-out);
+  --transition-all: all var(--duration-150) var(--ease-in-out);
+  --transition-base: all var(--duration-150) var(--ease-in-out);
+}
+
+// ============================================================================
+// BREAKPOINTS
+// ============================================================================
+// Responsive design breakpoints
+
+:root {
+  --breakpoint-xs: 0px;
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+}
+
+// ============================================================================
+// Z-INDEX SCALE
+// ============================================================================
+// Consistent layering system
+
+:root {
+  --z-hide: -1;
+  --z-auto: auto;
+  --z-base: 0;
+  --z-docked: 10;
+  --z-dropdown: 1000;
+  --z-sticky: 1100;
+  --z-banner: 1200;
+  --z-overlay: 1300;
+  --z-modal: 1400;
+  --z-popover: 1500;
+  --z-skiplink: 1600;
+  --z-toast: 1700;
+  --z-tooltip: 1800;
+}
+
+// ============================================================================
+// COMPONENT TOKENS
+// ============================================================================
+// Specific tokens for common component patterns
+
+:root {
+  // Buttons
+  --button-height-sm: 32px;
+  --button-height-md: 40px;
+  --button-height-lg: 48px;
+  --button-padding-x-sm: var(--spacing-md);
+  --button-padding-x-md: var(--spacing-lg);
+  --button-padding-x-lg: var(--spacing-xl);
+  
+  // Form elements
+  --input-height-sm: 32px;
+  --input-height-md: 40px;
+  --input-height-lg: 48px;
+  --input-border-width: 1px;
+  --input-focus-border-width: 2px;
+  
+  // Cards
+  --card-padding-sm: var(--spacing-lg);
+  --card-padding-md: var(--spacing-xl);
+  --card-padding-lg: var(--spacing-2xl);
+  
+  // Tables
+  --table-cell-padding-x: var(--spacing-lg);
+  --table-cell-padding-y: var(--spacing-md);
+  --table-header-height: 48px;
+  --table-row-height: 56px;
+}

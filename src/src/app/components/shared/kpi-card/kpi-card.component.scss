@@ -1,0 +1,418 @@
+// KPI Card Component Styles
+// Uses design system tokens for consistency
+
+.kpi-card {
+  position: relative;
+  transition: var(--transition-all);
+  border: 1px solid var(--color-neutral-200);
+  overflow: hidden;
+
+  // Base card styling
+  background: var(--color-background-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--elevation-1);
+
+  // Remove default Material card padding
+  .mat-mdc-card-content {
+    padding: 0;
+  }
+
+  // Clickable state
+  &--clickable {
+    cursor: pointer;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--elevation-2);
+      border-color: var(--color-primary-200);
+    }
+
+    &:active {
+      transform: translateY(0);
+      box-shadow: var(--elevation-1);
+    }
+  }
+
+  // Loading state
+  &--loading {
+    pointer-events: none;
+  }
+
+  // Size variants
+  &--compact {
+    .kpi-card__content {
+      padding: var(--spacing-md);
+      min-height: 88px;
+    }
+  }
+
+  &--standard {
+    .kpi-card__content {
+      padding: var(--spacing-lg);
+      min-height: 120px;
+    }
+  }
+
+  &--large {
+    .kpi-card__content {
+      padding: var(--spacing-xl);
+      min-height: 150px;
+    }
+  }
+
+  // Density variants
+  &--compact {
+    .kpi-card__value {
+      font-size: var(--font-size-2xl);
+      line-height: var(--line-height-tight);
+      margin: var(--spacing-xs) 0;
+    }
+
+    .kpi-card__title {
+      font-size: var(--font-size-sm);
+    }
+
+    .kpi-card__icon {
+      width: 20px;
+      height: 20px;
+      font-size: 20px;
+    }
+  }
+
+  &--comfortable {
+    .kpi-card__value {
+      font-size: var(--font-size-3xl);
+      line-height: var(--line-height-tight);
+      margin: var(--spacing-sm) 0;
+    }
+
+    .kpi-card__title {
+      font-size: var(--font-size-base);
+    }
+
+    .kpi-card__icon {
+      width: 24px;
+      height: 24px;
+      font-size: 24px;
+    }
+  }
+
+  // Color variants
+  &--primary {
+    border-left: 4px solid var(--color-primary-500);
+
+    .kpi-card__icon {
+      color: var(--color-primary-500);
+    }
+
+    .kpi-card__value {
+      color: var(--color-primary-600);
+    }
+
+    &.kpi-card--clickable:hover {
+      border-color: var(--color-primary-300);
+      background: var(--color-primary-50);
+    }
+  }
+
+  &--secondary {
+    border-left: 4px solid var(--color-secondary-500);
+
+    .kpi-card__icon {
+      color: var(--color-secondary-600);
+    }
+
+    .kpi-card__value {
+      color: var(--color-secondary-700);
+    }
+
+    &.kpi-card--clickable:hover {
+      border-color: var(--color-secondary-300);
+      background: var(--color-secondary-50);
+    }
+  }
+
+  &--success {
+    border-left: 4px solid var(--color-success-500);
+
+    .kpi-card__icon {
+      color: var(--color-success-500);
+    }
+
+    .kpi-card__value {
+      color: var(--color-success-600);
+    }
+
+    &.kpi-card--clickable:hover {
+      border-color: var(--color-success-300);
+      background: var(--color-success-50);
+    }
+  }
+
+  &--warning {
+    border-left: 4px solid var(--color-warning-500);
+
+    .kpi-card__icon {
+      color: var(--color-warning-500);
+    }
+
+    .kpi-card__value {
+      color: var(--color-warning-600);
+    }
+
+    &.kpi-card--clickable:hover {
+      border-color: var(--color-warning-300);
+      background: var(--color-warning-50);
+    }
+  }
+
+  &--error {
+    border-left: 4px solid var(--color-error-500);
+
+    .kpi-card__icon {
+      color: var(--color-error-500);
+    }
+
+    .kpi-card__value {
+      color: var(--color-error-600);
+    }
+
+    &.kpi-card--clickable:hover {
+      border-color: var(--color-error-300);
+      background: var(--color-error-50);
+    }
+  }
+
+  &--info {
+    border-left: 4px solid var(--color-info-500);
+
+    .kpi-card__icon {
+      color: var(--color-info-500);
+    }
+
+    .kpi-card__value {
+      color: var(--color-info-600);
+    }
+
+    &.kpi-card--clickable:hover {
+      border-color: var(--color-info-300);
+      background: var(--color-info-50);
+    }
+  }
+}
+
+// Card Content Structure
+.kpi-card__content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+}
+
+.kpi-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-xs);
+}
+
+.kpi-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.kpi-card__value {
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  margin: var(--spacing-xs) 0;
+}
+
+.kpi-card__labels {
+  flex-grow: 1;
+}
+
+.kpi-card__title {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  line-height: var(--line-height-snug);
+  margin-bottom: var(--spacing-xs);
+}
+
+.kpi-card__subtitle {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-normal);
+}
+
+.kpi-card__period {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  margin-top: auto;
+}
+
+.kpi-card__click-hint {
+  position: absolute;
+  top: var(--spacing-xs);
+  right: var(--spacing-xs);
+  opacity: 0;
+  transition: var(--transition-opacity);
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    color: var(--color-text-disabled);
+  }
+
+  .kpi-card--clickable:hover & {
+    opacity: 1;
+  }
+}
+
+// Trend Indicator
+.kpi-card__trend {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+
+  .trend-icon {
+    font-size: 12px;
+    width: 12px;
+    height: 12px;
+  }
+
+  &.trend--positive {
+    background: var(--color-success-100);
+    color: var(--color-success-700);
+
+    .trend-icon {
+      color: var(--color-success-600);
+    }
+  }
+
+  &.trend--negative {
+    background: var(--color-error-100);
+    color: var(--color-error-700);
+
+    .trend-icon {
+      color: var(--color-error-600);
+    }
+  }
+
+  &.trend--neutral {
+    background: var(--color-neutral-100);
+    color: var(--color-neutral-700);
+
+    .trend-icon {
+      color: var(--color-neutral-600);
+    }
+  }
+}
+
+// Loading Skeleton
+.kpi-card__skeleton {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-md);
+  gap: var(--spacing-md);
+
+  .skeleton-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(90deg, var(--color-neutral-200) 25%, var(--color-neutral-100) 50%, var(--color-neutral-200) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+  }
+
+  .skeleton-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+
+  .skeleton-value {
+    height: 24px;
+    width: 60%;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(90deg, var(--color-neutral-200) 25%, var(--color-neutral-100) 50%, var(--color-neutral-200) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+  }
+
+  .skeleton-title {
+    height: 16px;
+    width: 80%;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(90deg, var(--color-neutral-200) 25%, var(--color-neutral-100) 50%, var(--color-neutral-200) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+  }
+}
+
+// Skeleton animation
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 480px) {
+  .kpi-card {
+    &--compact .kpi-card__content {
+      padding: var(--spacing-sm);
+      min-height: 80px;
+    }
+
+    .kpi-card__value {
+      font-size: var(--font-size-xl) !important;
+    }
+
+    .kpi-card__trend {
+      flex-direction: column;
+      gap: 2px;
+      padding: var(--spacing-xs);
+
+      .trend-value {
+        font-size: var(--font-size-xs);
+      }
+    }
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .kpi-card {
+    border-width: 2px;
+    
+    &--clickable:hover {
+      border-width: 3px;
+    }
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .kpi-card {
+    transition: none;
+
+    &--clickable:hover {
+      transform: none;
+    }
+  }
+
+  .kpi-card__skeleton * {
+    animation: none;
+  }
+}

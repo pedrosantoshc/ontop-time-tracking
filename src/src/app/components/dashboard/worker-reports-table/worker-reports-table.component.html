@@ -1,0 +1,34 @@
+<div class="worker-reports-table">
+  <mat-card class="worker-reports-card mat-elevation-z2">
+    
+    <!-- Table Header -->
+    <mat-card-header class="worker-reports-header">
+      <mat-card-title class="worker-reports-title">
+        <div class="title-content">
+          <span class="title-text">Worker Hours Summary</span>
+          <div class="title-stats">
+            <mat-icon>people</mat-icon>
+            <span>{{ reports.length }} workers • {{ totalHours }} total hours</span>
+          </div>
+        </div>
+      </mat-card-title>
+    </mat-card-header>
+
+    <!-- Table Content -->
+    <mat-card-content class="worker-reports-content">
+      <app-advanced-data-table
+        [data]="reports"
+        [columns]="tableColumns"
+        [config]="tableConfig"
+        [actions]="tableActions"
+        [loading]="loading"
+        emptyMessage="No time data available"
+        loadingMessage="Loading worker reports..."
+        (rowClick)="onTableRowClick($event)"
+        (export)="onTableExport()"
+        (refresh)="onTableRefresh()">
+      </app-advanced-data-table>
+    </mat-card-content>
+    
+  </mat-card>
+</div>

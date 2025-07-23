@@ -1,0 +1,355 @@
+@import '../../../../styles/design-tokens.scss';
+
+.app-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &--overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(2px);
+    z-index: 10;
+  }
+
+  &--fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+  }
+
+  // Size variants
+  &--small {
+    .app-loading__message {
+      font-size: var(--font-size-xs);
+    }
+  }
+
+  &--medium {
+    .app-loading__message {
+      font-size: var(--font-size-sm);
+    }
+  }
+
+  &--large {
+    .app-loading__message {
+      font-size: var(--font-size-base);
+    }
+  }
+
+  // Variant colors
+  &--primary {
+    .mat-mdc-progress-spinner,
+    .app-loading__dots .app-loading__dot {
+      --mdc-circular-progress-active-indicator-color: var(--color-primary-500);
+      color: var(--color-primary-500);
+    }
+
+    .mat-mdc-progress-bar {
+      --mdc-linear-progress-active-indicator-color: var(--color-primary-500);
+    }
+  }
+
+  &--secondary {
+    .mat-mdc-progress-spinner,
+    .app-loading__dots .app-loading__dot {
+      --mdc-circular-progress-active-indicator-color: var(--color-text-secondary);
+      color: var(--color-text-secondary);
+    }
+
+    .mat-mdc-progress-bar {
+      --mdc-linear-progress-active-indicator-color: var(--color-text-secondary);
+    }
+  }
+
+  &--accent {
+    .mat-mdc-progress-spinner,
+    .app-loading__dots .app-loading__dot {
+      --mdc-circular-progress-active-indicator-color: var(--color-accent-500);
+      color: var(--color-accent-500);
+    }
+
+    .mat-mdc-progress-bar {
+      --mdc-linear-progress-active-indicator-color: var(--color-accent-500);
+    }
+  }
+}
+
+.app-loading__container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  text-align: center;
+
+  &--with-message {
+    gap: var(--spacing-sm);
+  }
+}
+
+// Spinner Loading
+.app-loading__spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .mat-mdc-progress-spinner {
+    svg circle {
+      stroke: currentColor;
+    }
+  }
+}
+
+// Progress Bar Loading
+.app-loading__bar {
+  width: 200px;
+  min-width: 150px;
+
+  .app-loading--small & {
+    width: 150px;
+    height: 3px;
+  }
+
+  .app-loading--medium & {
+    width: 200px;
+    height: 4px;
+  }
+
+  .app-loading--large & {
+    width: 300px;
+    height: 6px;
+  }
+
+  .mat-mdc-progress-bar {
+    border-radius: var(--radius-full);
+    overflow: hidden;
+
+    .mdc-linear-progress__bar-inner {
+      border-radius: var(--radius-full);
+    }
+  }
+}
+
+// Dots Loading
+.app-loading__dots {
+  display: flex;
+  gap: var(--spacing-xs);
+  align-items: center;
+}
+
+.app-loading__dot {
+  border-radius: 50%;
+  background: currentColor;
+  animation: dotPulse 1.4s infinite ease-in-out;
+
+  .app-loading--small & {
+    width: 6px;
+    height: 6px;
+  }
+
+  .app-loading--medium & {
+    width: 8px;
+    height: 8px;
+  }
+
+  .app-loading--large & {
+    width: 12px;
+    height: 12px;
+  }
+
+  &:nth-child(1) {
+    animation-delay: -0.32s;
+  }
+
+  &:nth-child(2) {
+    animation-delay: -0.16s;
+  }
+
+  &:nth-child(3) {
+    animation-delay: 0;
+  }
+}
+
+@keyframes dotPulse {
+  0%, 80%, 100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+// Skeleton Loading
+.app-loading__skeleton {
+  width: 100%;
+  max-width: 400px;
+}
+
+.app-loading__skeleton-default {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.app-loading__skeleton-line {
+  height: 16px;
+  background: linear-gradient(
+    90deg,
+    var(--color-neutral-200) 25%,
+    var(--color-neutral-100) 50%,
+    var(--color-neutral-200) 75%
+  );
+  background-size: 200% 100%;
+  border-radius: var(--radius-sm);
+  animation: skeletonShimmer 2s infinite;
+
+  &--title {
+    height: 20px;
+    width: 60%;
+  }
+
+  &--subtitle {
+    height: 16px;
+    width: 80%;
+  }
+
+  &--content {
+    height: 14px;
+    width: 100%;
+
+    &:last-child {
+      width: 70%;
+    }
+  }
+
+  .app-loading--small & {
+    height: 12px;
+
+    &--title {
+      height: 16px;
+    }
+
+    &--subtitle {
+      height: 14px;
+    }
+
+    &--content {
+      height: 12px;
+    }
+  }
+
+  .app-loading--large & {
+    height: 18px;
+
+    &--title {
+      height: 24px;
+    }
+
+    &--subtitle {
+      height: 20px;
+    }
+
+    &--content {
+      height: 16px;
+    }
+  }
+}
+
+@keyframes skeletonShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+// Loading Message
+.app-loading__message {
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+  margin: 0;
+  line-height: var(--line-height-relaxed);
+}
+
+// Dark theme support
+@media (prefers-color-scheme: dark) {
+  .app-loading {
+    &--overlay {
+      background: rgba(0, 0, 0, 0.6);
+    }
+
+    &--fullscreen {
+      background: rgba(0, 0, 0, 0.8);
+    }
+  }
+
+  .app-loading__skeleton-line {
+    background: linear-gradient(
+      90deg,
+      var(--color-neutral-700) 25%,
+      var(--color-neutral-600) 50%,
+      var(--color-neutral-700) 75%
+    );
+    background-size: 200% 100%;
+  }
+}
+
+// High contrast mode
+@media (prefers-contrast: high) {
+  .app-loading__skeleton-line {
+    background: var(--color-neutral-400);
+    animation: none;
+  }
+
+  .app-loading__dots .app-loading__dot {
+    border: 1px solid currentColor;
+  }
+}
+
+// Reduced motion
+@media (prefers-reduced-motion: reduce) {
+  .app-loading__skeleton-line,
+  .app-loading__dot {
+    animation: none !important;
+  }
+
+  .mat-mdc-progress-spinner {
+    animation: none !important;
+  }
+
+  .mat-mdc-progress-bar .mdc-linear-progress__primary-bar {
+    animation: none !important;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 480px) {
+  .app-loading__bar {
+    width: 150px;
+    min-width: 120px;
+  }
+
+  .app-loading__skeleton {
+    max-width: 300px;
+  }
+
+  .app-loading__container {
+    gap: var(--spacing-sm);
+
+    &--with-message {
+      gap: var(--spacing-xs);
+    }
+  }
+}

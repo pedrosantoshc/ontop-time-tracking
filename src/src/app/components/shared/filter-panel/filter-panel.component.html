@@ -1,0 +1,191 @@
+<mat-card class="filter-panel" [class.filter-panel--compact]="compact">
+  
+  <!-- Panel Header -->
+  <div class="filter-panel__header" (click)="onToggleExpanded()">
+    <div class="filter-panel__header-content">
+      <div class="filter-panel__title-section">
+        <mat-icon class="filter-panel__icon">{{ icon }}</mat-icon>
+        <div class="filter-panel__titles">
+          <h3 class="filter-panel__title">{{ title }}</h3>
+          <p *ngIf="subtitle && !compact" class="filter-panel__subtitle">{{ subtitle }}</p>
+        </div>
+      </div>
+
+      <div class="filter-panel__header-actions">
+        <!-- Active Filters Badge -->
+        <div *ngIf="showActiveCount && activeFiltersCount > 0" class="filter-panel__badge">
+          <mat-icon class="filter-panel__badge-icon">tune</mat-icon>
+          <span class="filter-panel__badge-text">{{ activeFiltersCount }}</span>
+        </div>
+
+        <!-- Collapse/Expand Button -->
+        <button 
+          *ngIf="collapsible"
+          mat-icon-button 
+          class="filter-panel__toggle"
+          [attr.aria-label]="isExpanded ? 'Collapse filters' : 'Expand filters'">
+          <mat-icon [class.filter-panel__toggle--expanded]="isExpanded">
+            {{ isExpanded ? 'expand_less' : 'expand_more' }}
+          </mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel Content -->
+  <div class="filter-panel__content" [class.filter-panel__content--collapsed]="collapsible && !isExpanded">
+    <mat-card-content class="filter-panel__body">
+
+      <!-- Filter Grid -->
+      <div class="filter-panel__grid" [class.filter-panel__grid--compact]="compact">
+
+        <!-- Dynamic Filter Rendering -->
+        <div *ngFor="let config of filterConfigs" class="filter-panel__item">
+
+          <!-- Select Filter -->
+          <mat-form-field *ngIf="config.type === 'select'" appearance="outline" class="filter-panel__field">
+            <mat-label>{{ config.label }}</mat-label>
+            <mat-icon *ngIf="config.icon" matPrefix>{{ config.icon }}</mat-icon>
+            <mat-select 
+              [value]="config.value" 
+              [disabled]="config.disabled"
+              [placeholder]="config.placeholder || 'Choose option'"
+              (selectionChange)="onFilterChange(config, $event.value)">
+              <mat-option *ngFor="let option of config.options" 
+                          [value]="option.value" 
+                          [disabled]="option.disabled">
+                {{ option.label }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Text Filter -->
+          <mat-form-field *ngIf="config.type === 'text'" appearance="outline" class="filter-panel__field">
+            <mat-label>{{ config.label }}</mat-label>
+            <mat-icon *ngIf="config.icon" matPrefix>{{ config.icon }}</mat-icon>
+            <input 
+              matInput 
+              [value]="config.value || ''" 
+              [disabled]="config.disabled"
+              [placeholder]="config.placeholder || 'Enter ' + config.label.toLowerCase()"
+              (input)="onFilterChange(config, $any($event.target).value)">
+          </mat-form-field>
+
+          <!-- Date Range Filter -->
+          <div *ngIf="config.type === 'dateRange'" class="filter-panel__date-range">
+            <h4 class="filter-panel__group-title">{{ config.label }}</h4>
+            <div class="filter-panel__date-inputs">
+              <mat-form-field appearance="outline" class="filter-panel__field filter-panel__field--half">
+                <mat-label>From Date</mat-label>
+                <mat-icon matPrefix>calendar_today</mat-icon>
+                <input 
+                  matInput 
+                  type="date" 
+                  [value]="config.value?.start || ''"
+                  [disabled]="config.disabled"
+                  (change)="onDateRangeStartChange(config, $any($event.target).value)">
+              </mat-form-field>
+              
+              <mat-form-field appearance="outline" class="filter-panel__field filter-panel__field--half">
+                <mat-label>To Date</mat-label>
+                <mat-icon matPrefix>calendar_today</mat-icon>
+                <input 
+                  matInput 
+                  type="date" 
+                  [value]="config.value?.end || ''"
+                  [disabled]="config.disabled"
+                  (change)="onDateRangeEndChange(config, $any($event.target).value)">
+              </mat-form-field>
+            </div>
+          </div>
+
+          <!-- Multi-Select Filter -->
+          <div *ngIf="config.type === 'multiSelect'" class="filter-panel__multi-select">
+            <h4 class="filter-panel__group-title">{{ config.label }}</h4>
+            <div class="filter-panel__multi-select-container">
+              
+              <!-- Selection Summary -->
+              <div class="filter-panel__multi-select-summary">
+                <mat-icon class="filter-panel__multi-select-icon">{{ config.icon || 'list' }}</mat-icon>
+                <span class="filter-panel__multi-select-label">{{ getMultiSelectLabel(config) }}</span>
+                <span *ngIf="config.value?.length" class="filter-panel__multi-select-count">
+                  {{ config.value.length }} of {{ config.options?.length || 0 }}
+                </span>
+              </div>
+
+              <!-- Options List -->
+              <div class="filter-panel__multi-select-options">
+                <div class="filter-panel__multi-select-controls">
+                  <button 
+                    mat-stroked-button 
+                    size="small" 
+                    class="filter-panel__select-button"
+                    (click)="onSelectAllOptions(config)">
+                    <mat-icon class="filter-panel__button-icon">select_all</mat-icon>
+                    Select All
+                  </button>
+                  <button 
+                    mat-stroked-button 
+                    size="small" 
+                    class="filter-panel__select-button"
+                    (click)="onFilterChange(config, [])">
+                    <mat-icon class="filter-panel__button-icon">clear</mat-icon>
+                    Clear
+                  </button>
+                </div>
+                
+                <div class="filter-panel__multi-select-list">
+                  <div *ngFor="let option of config.options" class="filter-panel__multi-select-item">
+                    <mat-checkbox 
+                      [checked]="isOptionSelected(config, option.value)"
+                      [disabled]="config.disabled || option.disabled"
+                      (change)="toggleMultiSelectOption(config, option.value)"
+                      color="primary">
+                      {{ option.label }}
+                    </mat-checkbox>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Checkbox Filter -->
+          <div *ngIf="config.type === 'checkbox'" class="filter-panel__checkbox">
+            <mat-checkbox 
+              [checked]="config.value || false"
+              [disabled]="config.disabled"
+              (change)="onFilterChange(config, $event.checked)"
+              color="primary"
+              class="filter-panel__checkbox-control">
+              {{ config.label }}
+            </mat-checkbox>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="filter-panel__actions" *ngIf="!compact">
+        <button 
+          mat-stroked-button 
+          class="filter-panel__action-button"
+          (click)="onResetFilters()"
+          [disabled]="activeFiltersCount === 0">
+          <mat-icon>refresh</mat-icon>
+          Reset Filters
+        </button>
+        
+        <button 
+          mat-raised-button 
+          color="primary" 
+          class="filter-panel__action-button"
+          (click)="onApplyFilters()">
+          <mat-icon>done</mat-icon>
+          Apply Filters
+        </button>
+      </div>
+
+    </mat-card-content>
+  </div>
+
+</mat-card>

@@ -1,0 +1,124 @@
+<mat-card class="simple-chart-card mat-elevation-z2">
+  
+  <!-- Chart Header -->
+  <mat-card-header class="chart-header">
+    <mat-card-title>{{ config.title }}</mat-card-title>
+    <mat-card-subtitle *ngIf="config.subtitle">{{ config.subtitle }}</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content class="chart-content">
+    
+    <!-- Bar Chart (Vertical) -->
+    <div *ngIf="config.type === 'bar'" class="chart-container bar-chart" [style.height.px]="config.height">
+      <div class="bars-container">
+        <div *ngFor="let item of processedData" class="bar-wrapper">
+          <div class="bar-container">
+            <div 
+              class="bar" 
+              [style.height.%]="getBarHeight(item.value)"
+              [style.background-color]="item.color">
+            </div>
+            <div *ngIf="config.showValues" class="bar-value">
+              {{ formatValue(item.value) }}
+              <span *ngIf="config.showPercentages" class="bar-percentage">
+                ({{ getPercentage(item.value) }}%)
+              </span>
+            </div>
+          </div>
+          <div class="bar-label">
+            <div class="label-text">{{ item.label }}</div>
+            <div *ngIf="item.subtitle" class="label-subtitle">{{ item.subtitle }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Horizontal Bar Chart -->
+    <div *ngIf="config.type === 'horizontal-bar'" class="chart-container horizontal-bar-chart">
+      <div class="horizontal-bars-container">
+        <div *ngFor="let item of processedData" class="horizontal-bar-wrapper">
+          <div class="horizontal-bar-label">
+            <div class="label-text">{{ item.label }}</div>
+            <div *ngIf="item.subtitle" class="label-subtitle">{{ item.subtitle }}</div>
+          </div>
+          <div class="horizontal-bar-container">
+            <div 
+              class="horizontal-bar" 
+              [style.width.%]="getBarWidth(item.value)"
+              [style.background-color]="item.color">
+            </div>
+            <div *ngIf="config.showValues" class="horizontal-bar-value">
+              {{ formatValue(item.value) }}
+              <span *ngIf="config.showPercentages" class="bar-percentage">
+                ({{ getPercentage(item.value) }}%)
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Donut Chart -->
+    <div *ngIf="config.type === 'donut'" class="chart-container donut-chart">
+      <div class="donut-wrapper">
+        <svg viewBox="0 0 100 100" class="donut-svg">
+          <!-- Background circle -->
+          <circle
+            cx="50"
+            cy="50"
+            r="45"
+            fill="none"
+            stroke="#f1f5f9"
+            stroke-width="10">
+          </circle>
+          
+          <!-- Data segments -->
+          <circle
+            *ngFor="let item of processedData; let i = index"
+            cx="50"
+            cy="50"
+            r="45"
+            fill="none"
+            [attr.stroke]="item.color"
+            stroke-width="10"
+            [attr.stroke-dasharray]="getDonutStrokeDasharray(item.value)"
+            [attr.stroke-dashoffset]="getDonutStrokeDashoffset(processedData.slice(0, i))"
+            class="donut-segment">
+          </circle>
+        </svg>
+        
+        <!-- Center content -->
+        <div class="donut-center">
+          <div class="donut-total">{{ formatValue(totalValue) }}</div>
+          <div class="donut-label">Total</div>
+        </div>
+      </div>
+      
+      <!-- Legend -->
+      <div class="donut-legend">
+        <div *ngFor="let item of processedData" class="legend-item">
+          <div class="legend-color" [style.background-color]="item.color"></div>
+          <div class="legend-content">
+            <div class="legend-label">{{ item.label }}</div>
+            <div class="legend-value">
+              {{ formatValue(item.value) }}
+              <span *ngIf="config.showPercentages" class="legend-percentage">
+                ({{ getPercentage(item.value) }}%)
+              </span>
+            </div>
+            <div *ngIf="item.subtitle" class="legend-subtitle">{{ item.subtitle }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!processedData || processedData.length === 0" class="chart-empty">
+      <mat-icon class="empty-icon">bar_chart</mat-icon>
+      <div class="empty-text">No data available</div>
+      <div class="empty-subtext">Data will appear here when available</div>
+    </div>
+
+  </mat-card-content>
+  
+</mat-card>

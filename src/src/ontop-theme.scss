@@ -1,0 +1,153 @@
+@use '@angular/material' as mat;
+
+// Include the common styles for Angular Material. We include this here so that you only
+// have to load a single css file for Angular Material in your app.
+@include mat.core();
+
+// Define the Ontop color palette
+$ontop-pink-palette: (
+  50: #fff0f2,
+  100: #ffdde2,
+  200: #ffc1cb,
+  300: #ff95a6,
+  400: #ff5a70,
+  500: #ff5a70, // Main Ontop Wild Watermelon
+  600: #f63354,
+  700: #e01e3e,
+  800: #bc1b35,
+  900: #a01b33,
+  A100: #ffc1cb,
+  A200: #ff95a6,
+  A400: #ff5a70,
+  A700: #e01e3e,
+  contrast: (
+    50: rgba(black, 0.87),
+    100: rgba(black, 0.87),
+    200: rgba(black, 0.87),
+    300: rgba(black, 0.87),
+    400: white,
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A100: rgba(black, 0.87),
+    A200: rgba(black, 0.87),
+    A400: white,
+    A700: white,
+  )
+);
+
+$ontop-accent-palette: (
+  50: #f0fdf4,
+  100: #dcfce7,
+  200: #bbf7d0,
+  300: #86efac,
+  400: #4ade80,
+  500: #22c55e,
+  600: #16a34a,
+  700: #15803d,
+  800: #166534,
+  900: #14532d,
+  A100: #dcfce7,
+  A200: #bbf7d0,
+  A400: #4ade80,
+  A700: #15803d,
+  contrast: (
+    50: rgba(black, 0.87),
+    100: rgba(black, 0.87),
+    200: rgba(black, 0.87),
+    300: rgba(black, 0.87),
+    400: rgba(black, 0.87),
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A100: rgba(black, 0.87),
+    A200: rgba(black, 0.87),
+    A400: rgba(black, 0.87),
+    A700: white,
+  )
+);
+
+$ontop-warn-palette: (
+  50: #fef2f2,
+  100: #fee2e2,
+  200: #fecaca,
+  300: #fca5a5,
+  400: #f87171,
+  500: #EF4444, // Ontop red
+  600: #dc2626,
+  700: #b91c1c,
+  800: #991b1b,
+  900: #7f1d1d,
+  A100: #fee2e2,
+  A200: #fecaca,
+  A400: #f87171,
+  A700: #b91c1c,
+  contrast: (
+    50: rgba(black, 0.87),
+    100: rgba(black, 0.87),
+    200: rgba(black, 0.87),
+    300: rgba(black, 0.87),
+    400: rgba(black, 0.87),
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A100: rgba(black, 0.87),
+    A200: rgba(black, 0.87),
+    A400: rgba(black, 0.87),
+    A700: white,
+  )
+);
+
+// Create the theme using our custom palettes
+$ontop-primary: mat.m2-define-palette($ontop-pink-palette, 500);
+$ontop-accent: mat.m2-define-palette($ontop-accent-palette, 600);
+$ontop-warn: mat.m2-define-palette($ontop-warn-palette, 500);
+
+// Create the theme object
+$ontop-theme: mat.m2-define-light-theme((
+  color: (
+    primary: $ontop-primary,
+    accent: $ontop-accent,
+    warn: $ontop-warn,
+  )
+));
+
+// Include theme styles for core and each component used in your app.
+@include mat.all-component-themes($ontop-theme);
+
+// Custom CSS variables for consistency with existing styles
+// Note: Main variables are defined in design-tokens.scss
+:root {
+  --mat-primary-50: #fff0f2;
+  --mat-primary-100: #ffdde2;
+  --mat-primary-200: #ffc1cb;
+  --mat-primary-300: #ff95a6;
+  --mat-primary-400: #ff5a70;
+  --mat-primary-500: #ff5a70;
+  --mat-primary-600: #f63354;
+  --mat-primary-700: #e01e3e;
+  --mat-primary-800: #bc1b35;
+  --mat-primary-900: #a01b33;
+}
+
+// Custom spacing utilities that work with Material Design
+.mat-spacing-xs { margin: 4px; }
+.mat-spacing-sm { margin: 8px; }
+.mat-spacing-md { margin: 16px; }
+.mat-spacing-lg { margin: 24px; }
+.mat-spacing-xl { margin: 32px; }
+
+// Responsive breakpoints for consistency
+@media (max-width: 599px) {
+  .hide-on-mobile { display: none !important; }
+}
+
+@media (min-width: 600px) {
+  .show-on-mobile { display: none !important; }
+}

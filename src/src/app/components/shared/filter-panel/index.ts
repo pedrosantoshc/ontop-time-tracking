@@ -1,0 +1,1 @@
+export { FilterPanelComponent, FilterConfig, FilterOption, FilterChangeEvent } from './filter-panel.component';

@@ -1,0 +1,54 @@
+<div class="app-modal-backdrop" (click)="onBackdropClick()">
+  <div [ngClass]="getContainerClass()" (click)="$event.stopPropagation()">
+    
+    <!-- Loading Overlay -->
+    <div *ngIf="loading" class="app-modal__loading-overlay">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p class="app-modal__loading-message">{{ loadingMessage }}</p>
+    </div>
+    
+    <!-- Modal Header -->
+    <header class="app-modal__header" *ngIf="title || showCloseButton">
+      <div class="app-modal__header-content">
+        <div class="app-modal__title-section">
+          <h2 *ngIf="title" class="app-modal__title">{{ title }}</h2>
+          <p *ngIf="subtitle" class="app-modal__subtitle">{{ subtitle }}</p>
+        </div>
+        
+        <button 
+          *ngIf="showCloseButton"
+          class="app-modal__close-button"
+          (click)="onClose()"
+          [disabled]="loading"
+          aria-label="Close modal">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </header>
+    
+    <!-- Modal Body -->
+    <main class="app-modal__body">
+      <ng-content></ng-content>
+    </main>
+    
+    <!-- Modal Footer -->
+    <footer *ngIf="showFooter && buttons.length > 0" class="app-modal__footer">
+      <div class="app-modal__footer-content">
+        <ng-content select="[slot=footer-left]"></ng-content>
+        
+        <div class="app-modal__buttons">
+          <app-button
+            *ngFor="let button of buttons"
+            [variant]="button.variant || 'primary'"
+            [loading]="button.loading || false"
+            [disabled]="button.disabled || loading"
+            [icon]="button.icon || ''"
+            (click)="onButtonClick(button.action)">
+            {{ button.label }}
+          </app-button>
+        </div>
+      </div>
+    </footer>
+    
+  </div>
+</div>

@@ -1,0 +1,299 @@
+@import '../../../../styles/design-tokens.scss';
+
+.main-layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--color-background);
+  position: relative;
+
+  &--mobile {
+    // Mobile-specific overrides
+    .main-layout__content {
+      margin-left: 0 !important;
+    }
+  }
+}
+
+// Main Content Area
+.main-layout__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-left: 250px; // Default sidebar width
+  transition: margin-left var(--transition-base);
+  min-height: 100vh;
+  position: relative;
+
+  // Collapsed sidebar state
+  &--sidebar-collapsed {
+    margin-left: 60px;
+  }
+
+  // Mobile responsiveness
+  @media (max-width: 768px) {
+    margin-left: 0;
+    
+    &--sidebar-collapsed {
+      margin-left: 0;
+    }
+  }
+
+  // Content padding variations
+  &--none {
+    .main-layout__page-content {
+      padding: 0;
+    }
+  }
+
+  &--compact {
+    .main-layout__page-content {
+      padding: var(--spacing-sm) var(--spacing-md);
+    }
+  }
+
+  &--normal {
+    .main-layout__page-content {
+      padding: var(--spacing-lg) var(--spacing-xl);
+      
+      @media (max-width: 768px) {
+        padding: var(--spacing-md);
+      }
+    }
+  }
+
+  &--wide {
+    .main-layout__page-content {
+      padding: var(--spacing-xl) var(--spacing-2xl);
+      
+      @media (max-width: 768px) {
+        padding: var(--spacing-md);
+      }
+    }
+  }
+
+  // Max-width containers
+  &--sm .main-layout__page-content {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  &--md .main-layout__page-content {
+    max-width: 768px;
+    margin: 0 auto;
+  }
+
+  &--lg .main-layout__page-content {
+    max-width: 1024px;
+    margin: 0 auto;
+  }
+
+  &--xl .main-layout__page-content {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+}
+
+// Optional Top Bar
+.main-layout__topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: white;
+  
+  .mat-toolbar {
+    height: 64px;
+    padding: 0 var(--spacing-md);
+  }
+}
+
+.main-layout__menu-button {
+  margin-right: var(--spacing-sm);
+  
+  @media (min-width: 769px) {
+    display: none; // Hide on desktop when sidebar is always visible
+  }
+}
+
+.main-layout__title {
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-lg);
+}
+
+// Page Content
+.main-layout__page-content {
+  flex: 1;
+  position: relative;
+  
+  // Default responsive padding
+  padding: var(--spacing-lg) var(--spacing-xl);
+  
+  @media (max-width: 1024px) {
+    padding: var(--spacing-md) var(--spacing-lg);
+  }
+  
+  @media (max-width: 768px) {
+    padding: var(--spacing-md);
+  }
+}
+
+// Mobile Overlay
+.main-layout__overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  backdrop-filter: blur(2px);
+  
+  @media (min-width: 769px) {
+    display: none;
+  }
+}
+
+// Enhanced Grid System Classes (utility classes for page layouts)
+.dashboard-grid {
+  display: grid;
+  gap: var(--spacing-lg);
+  
+  &--dense {
+    gap: var(--spacing-sm);
+    
+    @media (min-width: 640px) {
+      gap: var(--spacing-md);
+    }
+    
+    @media (min-width: 1024px) {
+      gap: var(--spacing-lg);
+    }
+  }
+  
+  &--cols-1 {
+    grid-template-columns: 1fr;
+  }
+  
+  &--cols-2 {
+    grid-template-columns: repeat(1, 1fr);
+    
+    @media (min-width: 640px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  &--cols-3 {
+    grid-template-columns: repeat(1, 1fr);
+    
+    @media (min-width: 640px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  &--cols-4 {
+    grid-template-columns: repeat(1, 1fr);
+    
+    @media (min-width: 640px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    @media (min-width: 1024px) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  
+  // Auto-fit with minimum column width
+  &--auto-fit {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+  }
+}
+
+// Section spacing utilities
+.section {
+  margin-bottom: var(--spacing-xl);
+  
+  &--compact {
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  &--spacious {
+    margin-bottom: var(--spacing-2xl);
+  }
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Card spacing utilities for improved layouts
+.card-grid {
+  display: grid;
+  gap: var(--spacing-lg);
+  
+  &--dense {
+    gap: var(--spacing-md);
+  }
+  
+  &--sparse {
+    gap: var(--spacing-xl);
+  }
+}
+
+// Flexbox utilities for responsive layouts
+.flex-layout {
+  display: flex;
+  gap: var(--spacing-md);
+  
+  &--column {
+    flex-direction: column;
+  }
+  
+  &--wrap {
+    flex-wrap: wrap;
+  }
+  
+  &--center {
+    align-items: center;
+    justify-content: center;
+  }
+  
+  &--between {
+    justify-content: space-between;
+  }
+  
+  &--responsive {
+    flex-direction: column;
+    
+    @media (min-width: 768px) {
+      flex-direction: row;
+    }
+  }
+}
+
+// Accessibility improvements
+.main-layout__content:focus {
+  outline: none;
+}
+
+// Print styles
+@media print {
+  .main-layout__topbar,
+  .sidebar {
+    display: none;
+  }
+  
+  .main-layout__content {
+    margin-left: 0;
+  }
+  
+  .main-layout__page-content {
+    padding: 0;
+  }
+}

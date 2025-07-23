@@ -1,0 +1,464 @@
+/**
+ * Ontop Design System - Layout System
+ * 
+ * This file provides a comprehensive layout system using CSS Grid and Flexbox
+ * for responsive, consistent layouts throughout the application.
+ */
+
+@import './design-tokens.scss';
+
+// ============================================================================
+// CONTAINER SYSTEM
+// ============================================================================
+
+.container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--spacing-lg);
+  padding-right: var(--spacing-lg);
+  
+  &--sm {
+    max-width: 640px;
+  }
+  
+  &--md {
+    max-width: 768px;
+  }
+  
+  &--lg {
+    max-width: 1024px;
+  }
+  
+  &--xl {
+    max-width: 1280px;
+  }
+  
+  &--2xl {
+    max-width: 1536px;
+  }
+  
+  &--fluid {
+    max-width: none;
+  }
+}
+
+// ============================================================================
+// CSS GRID SYSTEM
+// ============================================================================
+
+.grid {
+  display: grid;
+  gap: var(--spacing-lg);
+  
+  // Column definitions
+  &--cols-1 { grid-template-columns: repeat(1, 1fr); }
+  &--cols-2 { grid-template-columns: repeat(2, 1fr); }
+  &--cols-3 { grid-template-columns: repeat(3, 1fr); }
+  &--cols-4 { grid-template-columns: repeat(4, 1fr); }
+  &--cols-5 { grid-template-columns: repeat(5, 1fr); }
+  &--cols-6 { grid-template-columns: repeat(6, 1fr); }
+  &--cols-12 { grid-template-columns: repeat(12, 1fr); }
+  
+  // Auto-fit responsive grids
+  &--auto-fit-sm { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+  &--auto-fit-md { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+  &--auto-fit-lg { grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); }
+  
+  // Gap variations
+  &--gap-xs { gap: var(--spacing-xs); }
+  &--gap-sm { gap: var(--spacing-sm); }
+  &--gap-md { gap: var(--spacing-md); }
+  &--gap-lg { gap: var(--spacing-lg); }
+  &--gap-xl { gap: var(--spacing-xl); }
+  &--gap-2xl { gap: var(--spacing-2xl); }
+  &--gap-3xl { gap: var(--spacing-3xl); }
+  
+  // Responsive grid columns
+  @media (min-width: 576px) {
+    &--sm-cols-1 { grid-template-columns: repeat(1, 1fr); }
+    &--sm-cols-2 { grid-template-columns: repeat(2, 1fr); }
+    &--sm-cols-3 { grid-template-columns: repeat(3, 1fr); }
+    &--sm-cols-4 { grid-template-columns: repeat(4, 1fr); }
+  }
+  
+  @media (min-width: 768px) {
+    &--md-cols-1 { grid-template-columns: repeat(1, 1fr); }
+    &--md-cols-2 { grid-template-columns: repeat(2, 1fr); }
+    &--md-cols-3 { grid-template-columns: repeat(3, 1fr); }
+    &--md-cols-4 { grid-template-columns: repeat(4, 1fr); }
+    &--md-cols-6 { grid-template-columns: repeat(6, 1fr); }
+  }
+  
+  @media (min-width: 1024px) {
+    &--lg-cols-1 { grid-template-columns: repeat(1, 1fr); }
+    &--lg-cols-2 { grid-template-columns: repeat(2, 1fr); }
+    &--lg-cols-3 { grid-template-columns: repeat(3, 1fr); }
+    &--lg-cols-4 { grid-template-columns: repeat(4, 1fr); }
+    &--lg-cols-5 { grid-template-columns: repeat(5, 1fr); }
+    &--lg-cols-6 { grid-template-columns: repeat(6, 1fr); }
+  }
+  
+  @media (min-width: 1280px) {
+    &--xl-cols-1 { grid-template-columns: repeat(1, 1fr); }
+    &--xl-cols-2 { grid-template-columns: repeat(2, 1fr); }
+    &--xl-cols-3 { grid-template-columns: repeat(3, 1fr); }
+    &--xl-cols-4 { grid-template-columns: repeat(4, 1fr); }
+    &--xl-cols-5 { grid-template-columns: repeat(5, 1fr); }
+    &--xl-cols-6 { grid-template-columns: repeat(6, 1fr); }
+  }
+}
+
+// Grid item utilities
+.grid-item {
+  &--span-1 { grid-column: span 1; }
+  &--span-2 { grid-column: span 2; }
+  &--span-3 { grid-column: span 3; }
+  &--span-4 { grid-column: span 4; }
+  &--span-5 { grid-column: span 5; }
+  &--span-6 { grid-column: span 6; }
+  &--span-full { grid-column: 1 / -1; }
+  
+  &--row-span-1 { grid-row: span 1; }
+  &--row-span-2 { grid-row: span 2; }
+  &--row-span-3 { grid-row: span 3; }
+  &--row-span-4 { grid-row: span 4; }
+}
+
+// ============================================================================
+// FLEXBOX SYSTEM
+// ============================================================================
+
+.flex {
+  display: flex;
+  
+  // Direction
+  &--row { flex-direction: row; }
+  &--row-reverse { flex-direction: row-reverse; }
+  &--col { flex-direction: column; }
+  &--col-reverse { flex-direction: column-reverse; }
+  
+  // Wrap
+  &--wrap { flex-wrap: wrap; }
+  &--nowrap { flex-wrap: nowrap; }
+  &--wrap-reverse { flex-wrap: wrap-reverse; }
+  
+  // Justify content
+  &--justify-start { justify-content: flex-start; }
+  &--justify-end { justify-content: flex-end; }
+  &--justify-center { justify-content: center; }
+  &--justify-between { justify-content: space-between; }
+  &--justify-around { justify-content: space-around; }
+  &--justify-evenly { justify-content: space-evenly; }
+  
+  // Align items
+  &--items-start { align-items: flex-start; }
+  &--items-end { align-items: flex-end; }
+  &--items-center { align-items: center; }
+  &--items-baseline { align-items: baseline; }
+  &--items-stretch { align-items: stretch; }
+  
+  // Align content
+  &--content-start { align-content: flex-start; }
+  &--content-end { align-content: flex-end; }
+  &--content-center { align-content: center; }
+  &--content-between { align-content: space-between; }
+  &--content-around { align-content: space-around; }
+  &--content-evenly { align-content: space-evenly; }
+  
+  // Gap utilities
+  &--gap-xs { gap: var(--spacing-xs); }
+  &--gap-sm { gap: var(--spacing-sm); }
+  &--gap-md { gap: var(--spacing-md); }
+  &--gap-lg { gap: var(--spacing-lg); }
+  &--gap-xl { gap: var(--spacing-xl); }
+  &--gap-2xl { gap: var(--spacing-2xl); }
+}
+
+// Flex item utilities
+.flex-item {
+  &--1 { flex: 1 1 0%; }
+  &--auto { flex: 1 1 auto; }
+  &--initial { flex: 0 1 auto; }
+  &--none { flex: none; }
+  &--grow { flex-grow: 1; }
+  &--shrink { flex-shrink: 1; }
+  &--no-shrink { flex-shrink: 0; }
+}
+
+// ============================================================================
+// SPACING UTILITIES
+// ============================================================================
+
+// Margin utilities
+.m {
+  &-0 { margin: 0; }
+  &-xs { margin: var(--spacing-xs); }
+  &-sm { margin: var(--spacing-sm); }
+  &-md { margin: var(--spacing-md); }
+  &-lg { margin: var(--spacing-lg); }
+  &-xl { margin: var(--spacing-xl); }
+  &-2xl { margin: var(--spacing-2xl); }
+  &-3xl { margin: var(--spacing-3xl); }
+  &-auto { margin: auto; }
+}
+
+// Margin-top utilities
+.mt {
+  &-0 { margin-top: 0; }
+  &-xs { margin-top: var(--spacing-xs); }
+  &-sm { margin-top: var(--spacing-sm); }
+  &-md { margin-top: var(--spacing-md); }
+  &-lg { margin-top: var(--spacing-lg); }
+  &-xl { margin-top: var(--spacing-xl); }
+  &-2xl { margin-top: var(--spacing-2xl); }
+  &-3xl { margin-top: var(--spacing-3xl); }
+  &-auto { margin-top: auto; }
+}
+
+// Margin-bottom utilities
+.mb {
+  &-0 { margin-bottom: 0; }
+  &-xs { margin-bottom: var(--spacing-xs); }
+  &-sm { margin-bottom: var(--spacing-sm); }
+  &-md { margin-bottom: var(--spacing-md); }
+  &-lg { margin-bottom: var(--spacing-lg); }
+  &-xl { margin-bottom: var(--spacing-xl); }
+  &-2xl { margin-bottom: var(--spacing-2xl); }
+  &-3xl { margin-bottom: var(--spacing-3xl); }
+  &-auto { margin-bottom: auto; }
+}
+
+// Margin-left utilities
+.ml {
+  &-0 { margin-left: 0; }
+  &-xs { margin-left: var(--spacing-xs); }
+  &-sm { margin-left: var(--spacing-sm); }
+  &-md { margin-left: var(--spacing-md); }
+  &-lg { margin-left: var(--spacing-lg); }
+  &-xl { margin-left: var(--spacing-xl); }
+  &-2xl { margin-left: var(--spacing-2xl); }
+  &-3xl { margin-left: var(--spacing-3xl); }
+  &-auto { margin-left: auto; }
+}
+
+// Margin-right utilities
+.mr {
+  &-0 { margin-right: 0; }
+  &-xs { margin-right: var(--spacing-xs); }
+  &-sm { margin-right: var(--spacing-sm); }
+  &-md { margin-right: var(--spacing-md); }
+  &-lg { margin-right: var(--spacing-lg); }
+  &-xl { margin-right: var(--spacing-xl); }
+  &-2xl { margin-right: var(--spacing-2xl); }
+  &-3xl { margin-right: var(--spacing-3xl); }
+  &-auto { margin-right: auto; }
+}
+
+// Padding utilities
+.p {
+  &-0 { padding: 0; }
+  &-xs { padding: var(--spacing-xs); }
+  &-sm { padding: var(--spacing-sm); }
+  &-md { padding: var(--spacing-md); }
+  &-lg { padding: var(--spacing-lg); }
+  &-xl { padding: var(--spacing-xl); }
+  &-2xl { padding: var(--spacing-2xl); }
+  &-3xl { padding: var(--spacing-3xl); }
+}
+
+// Padding-top utilities
+.pt {
+  &-0 { padding-top: 0; }
+  &-xs { padding-top: var(--spacing-xs); }
+  &-sm { padding-top: var(--spacing-sm); }
+  &-md { padding-top: var(--spacing-md); }
+  &-lg { padding-top: var(--spacing-lg); }
+  &-xl { padding-top: var(--spacing-xl); }
+  &-2xl { padding-top: var(--spacing-2xl); }
+  &-3xl { padding-top: var(--spacing-3xl); }
+}
+
+// Padding-bottom utilities
+.pb {
+  &-0 { padding-bottom: 0; }
+  &-xs { padding-bottom: var(--spacing-xs); }
+  &-sm { padding-bottom: var(--spacing-sm); }
+  &-md { padding-bottom: var(--spacing-md); }
+  &-lg { padding-bottom: var(--spacing-lg); }
+  &-xl { padding-bottom: var(--spacing-xl); }
+  &-2xl { padding-bottom: var(--spacing-2xl); }
+  &-3xl { padding-bottom: var(--spacing-3xl); }
+}
+
+// Padding-left utilities
+.pl {
+  &-0 { padding-left: 0; }
+  &-xs { padding-left: var(--spacing-xs); }
+  &-sm { padding-left: var(--spacing-sm); }
+  &-md { padding-left: var(--spacing-md); }
+  &-lg { padding-left: var(--spacing-lg); }
+  &-xl { padding-left: var(--spacing-xl); }
+  &-2xl { padding-left: var(--spacing-2xl); }
+  &-3xl { padding-left: var(--spacing-3xl); }
+}
+
+// Padding-right utilities
+.pr {
+  &-0 { padding-right: 0; }
+  &-xs { padding-right: var(--spacing-xs); }
+  &-sm { padding-right: var(--spacing-sm); }
+  &-md { padding-right: var(--spacing-md); }
+  &-lg { padding-right: var(--spacing-lg); }
+  &-xl { padding-right: var(--spacing-xl); }
+  &-2xl { padding-right: var(--spacing-2xl); }
+  &-3xl { padding-right: var(--spacing-3xl); }
+}
+
+// ============================================================================
+// POSITIONING UTILITIES
+// ============================================================================
+
+.position {
+  &--static { position: static; }
+  &--relative { position: relative; }
+  &--absolute { position: absolute; }
+  &--fixed { position: fixed; }
+  &--sticky { position: sticky; }
+}
+
+// ============================================================================
+// LAYOUT COMPONENTS
+// ============================================================================
+
+// Main layout wrapper
+.layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  
+  &__header {
+    flex-shrink: 0;
+  }
+  
+  &__main {
+    flex: 1 1 auto;
+    padding: var(--spacing-lg);
+  }
+  
+  &__footer {
+    flex-shrink: 0;
+  }
+}
+
+// Sidebar layout
+.layout-sidebar {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  min-height: 100vh;
+  
+  &__sidebar {
+    width: 250px;
+    background-color: var(--color-background-secondary);
+    border-right: 1px solid var(--color-neutral-200);
+  }
+  
+  &__content {
+    overflow: hidden;
+  }
+  
+  // Responsive collapse
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    
+    &__sidebar {
+      display: none;
+      
+      &--open {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        z-index: var(--z-overlay);
+        box-shadow: var(--elevation-4);
+      }
+    }
+  }
+}
+
+// Stack layout (vertical spacing)
+.stack {
+  display: flex;
+  flex-direction: column;
+  
+  &--xs > * + * { margin-top: var(--spacing-xs); }
+  &--sm > * + * { margin-top: var(--spacing-sm); }
+  &--md > * + * { margin-top: var(--spacing-md); }
+  &--lg > * + * { margin-top: var(--spacing-lg); }
+  &--xl > * + * { margin-top: var(--spacing-xl); }
+  &--2xl > * + * { margin-top: var(--spacing-2xl); }
+}
+
+// Inline layout (horizontal spacing)
+.inline {
+  display: flex;
+  align-items: center;
+  
+  &--xs > * + * { margin-left: var(--spacing-xs); }
+  &--sm > * + * { margin-left: var(--spacing-sm); }
+  &--md > * + * { margin-left: var(--spacing-md); }
+  &--lg > * + * { margin-left: var(--spacing-lg); }
+  &--xl > * + * { margin-left: var(--spacing-xl); }
+  &--2xl > * + * { margin-left: var(--spacing-2xl); }
+}
+
+// Center alignment utility
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &--horizontal {
+    display: flex;
+    justify-content: center;
+  }
+  
+  &--vertical {
+    display: flex;
+    align-items: center;
+  }
+}
+
+// ============================================================================
+// RESPONSIVE UTILITIES
+// ============================================================================
+
+// Hide/show utilities
+.hidden { display: none !important; }
+.visible { display: block !important; }
+
+@media (max-width: 575px) {
+  .hidden-xs { display: none !important; }
+  .visible-xs { display: block !important; }
+}
+
+@media (min-width: 576px) and (max-width: 767px) {
+  .hidden-sm { display: none !important; }
+  .visible-sm { display: block !important; }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .hidden-md { display: none !important; }
+  .visible-md { display: block !important; }
+}
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .hidden-lg { display: none !important; }
+  .visible-lg { display: block !important; }
+}
+
+@media (min-width: 1280px) {
+  .hidden-xl { display: none !important; }
+  .visible-xl { display: block !important; }
+}

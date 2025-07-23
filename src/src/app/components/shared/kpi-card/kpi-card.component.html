@@ -1,0 +1,53 @@
+<mat-card 
+  class="kpi-card"
+  [class]="getVariantClass() + ' ' + getSizeClass() + ' ' + getDensityClass()"
+  [class.kpi-card--clickable]="data.clickable && !data.loading"
+  [class.kpi-card--loading]="data.loading"
+  (click)="onCardClick()"
+  matRipple
+  [matRippleDisabled]="!(data.clickable ?? false) || (data.loading ?? false)">
+  
+  <!-- Loading Skeleton -->
+  <div *ngIf="data.loading" class="kpi-card__skeleton">
+    <div class="skeleton-icon"></div>
+    <div class="skeleton-content">
+      <div class="skeleton-value"></div>
+      <div class="skeleton-title"></div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!data.loading" class="kpi-card__content">
+    
+    <!-- Header with Icon and Trend -->
+    <div class="kpi-card__header">
+      <mat-icon class="kpi-card__icon">{{ data.icon }}</mat-icon>
+      
+      <!-- Trend Indicator -->
+      <div *ngIf="data.trend" class="kpi-card__trend" [class]="getTrendClass()">
+        <mat-icon class="trend-icon">{{ getTrendIcon() }}</mat-icon>
+        <span class="trend-value">{{ formatTrendValue() }}</span>
+      </div>
+    </div>
+
+    <!-- Main Value -->
+    <div class="kpi-card__value">{{ formatValue() }}</div>
+
+    <!-- Title and Subtitle -->
+    <div class="kpi-card__labels">
+      <div class="kpi-card__title">{{ data.title }}</div>
+      <div *ngIf="data.subtitle" class="kpi-card__subtitle">{{ data.subtitle }}</div>
+    </div>
+
+    <!-- Trend Period (if available) -->
+    <div *ngIf="data.trend" class="kpi-card__period">
+      {{ data.trend.period }}
+    </div>
+
+    <!-- Click Hint -->
+    <div *ngIf="data.clickable" class="kpi-card__click-hint">
+      <mat-icon>open_in_new</mat-icon>
+    </div>
+
+  </div>
+</mat-card>

@@ -1,0 +1,39 @@
+<div [class]="getMainClass()">
+  
+  <!-- Sidebar Navigation -->
+  <app-sidebar 
+    [collapsed]="sidebarCollapsed"
+    [currentRoute]="currentRoute"
+    (toggleSidebar)="onToggleSidebar()"
+    (navigateToRoute)="onNavigateToRoute($event)">
+  </app-sidebar>
+
+  <!-- Main Content Area -->
+  <main [class]="getContentClass()">
+    
+    <!-- Enhanced Header -->
+    <app-enhanced-header 
+      *ngIf="pageConfig.showTopBar"
+      [title]="pageTitle"
+      [subtitle]="pageSubtitle"
+      [showBreadcrumbs]="isMobile"
+      [showActions]="true"
+      [actions]="headerActions"
+      (actionClick)="onHeaderAction($event)">
+    </app-enhanced-header>
+
+    <!-- Page Content -->
+    <div class="main-layout__page-content">
+      <ng-content></ng-content>
+    </div>
+    
+  </main>
+
+  <!-- Mobile Sidebar Overlay -->
+  <div 
+    *ngIf="isMobile && !sidebarCollapsed" 
+    class="main-layout__overlay"
+    (click)="onToggleSidebar()">
+  </div>
+
+</div>

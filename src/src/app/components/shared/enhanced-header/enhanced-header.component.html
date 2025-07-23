@@ -1,0 +1,55 @@
+<mat-toolbar class="enhanced-header" color="primary">
+  
+  <!-- Left Section: Title -->
+  <div class="header-left">
+    <!-- Page Title & Subtitle -->
+    <div class="header-title-section" *ngIf="title">
+      <h1 class="header-title">{{ title }}</h1>
+      <p *ngIf="subtitle" class="header-subtitle">{{ subtitle }}</p>
+    </div>
+  </div>
+
+  <!-- Right Section: Actions Only -->
+  <div class="header-right">
+    <!-- Header Actions -->
+    <div *ngIf="showActions && getVisibleActions().length > 0" class="header-actions">
+      <button *ngFor="let action of getVisibleActions()" 
+              mat-icon-button 
+              [color]="action.color || ''"
+              [disabled]="action.disabled"
+              [matTooltip]="action.tooltip || action.label"
+              [matBadge]="action.badge"
+              [matBadgeHidden]="!action.badge"
+              matBadgeColor="accent"
+              matBadgeSize="small"
+              (click)="onActionClick(action)"
+              class="header-action">
+        <mat-icon>{{ action.icon }}</mat-icon>
+      </button>
+    </div>
+  </div>
+
+</mat-toolbar>
+
+<!-- Mobile Breadcrumbs (shown on small screens) -->
+<div *ngIf="showBreadcrumbs && breadcrumbs.length > 0" class="mobile-breadcrumbs">
+  <div class="mobile-breadcrumb-container">
+    <!-- Back button for mobile -->
+    <button *ngIf="breadcrumbs.length > 1" 
+            mat-icon-button 
+            (click)="onBreadcrumbClick(breadcrumbs[breadcrumbs.length - 2])"
+            class="mobile-back-btn"
+            matTooltip="Go back">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    
+    <!-- Current page info -->
+    <div class="mobile-current-page">
+      <mat-icon *ngIf="breadcrumbs[breadcrumbs.length - 1]?.icon" 
+                class="mobile-page-icon">
+        {{ breadcrumbs[breadcrumbs.length - 1].icon }}
+      </mat-icon>
+      <span class="mobile-page-title">{{ breadcrumbs[breadcrumbs.length - 1].label }}</span>
+    </div>
+  </div>
+</div>

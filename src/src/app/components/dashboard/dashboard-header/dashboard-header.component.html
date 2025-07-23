@@ -1,0 +1,36 @@
+<div class="dashboard-header">
+  <div class="dashboard-header__content">
+    <div class="dashboard-header__text">
+      <h1 class="dashboard-header__title">{{ title }}</h1>
+      <p class="dashboard-header__subtitle">{{ subtitle }}</p>
+    </div>
+    
+    <div class="dashboard-header__actions">
+      <app-button 
+        variant="accent" 
+        icon="assessment"
+        (click)="goToReports()"
+        class="dashboard-header__action">
+        <span class="hide-on-mobile">Reports</span>
+      </app-button>
+      
+      <app-button 
+        variant="secondary"
+        icon="download"
+        [disabled]="isExporting"
+        [loading]="isExporting"
+        (click)="onExportClick()"
+        class="dashboard-header__action">
+        <span class="hide-on-mobile">{{ isExporting ? 'Exporting...' : 'Export' }}</span>
+      </app-button>
+      
+      <app-button 
+        variant="warn"
+        icon="delete"
+        (click)="onResetClick()"
+        class="dashboard-header__action">
+        <span class="hide-on-mobile">Reset</span>
+      </app-button>
+    </div>
+  </div>
+</div>

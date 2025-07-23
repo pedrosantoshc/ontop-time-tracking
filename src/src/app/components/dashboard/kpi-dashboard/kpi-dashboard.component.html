@@ -1,0 +1,20 @@
+<div class="kpi-dashboard">
+  <div class="kpi-dashboard__grid">
+    <app-kpi-card 
+      *ngFor="let card of kpiCards" 
+      [data]="card"
+      [config]="{ size: 'compact', density: 'compact' }"
+      (cardClick)="onKpiCardClick($event)"
+      class="kpi-dashboard__card">
+    </app-kpi-card>
+  </div>
+  
+  <!-- Loading State -->
+  <div *ngIf="loading" class="kpi-dashboard__loading">
+    <div class="kpi-dashboard__skeleton" *ngFor="let item of [1,2,3,4]">
+      <div class="skeleton-header"></div>
+      <div class="skeleton-value"></div>
+      <div class="skeleton-subtitle"></div>
+    </div>
+  </div>
+</div>

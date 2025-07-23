@@ -1,0 +1,126 @@
+<ng-container [ngSwitch]="getMaterialButtonType()">
+
+  <!-- Raised Button -->
+  <button 
+    [ngClass]="getButtonClass()"
+    [type]="type"
+    [disabled]="disabled || loading"
+    [matTooltip]="tooltip"
+    [attr.aria-label]="ariaLabel || tooltip"
+    [color]="getMaterialColor()"
+    mat-raised-button
+    *ngSwitchCase="'mat-raised-button'"
+    (click)="onButtonClick($event)">
+    
+    <!-- Loading Spinner -->
+    <mat-spinner 
+      *ngIf="loading" 
+      class="app-button__spinner"
+      diameter="16"
+      strokeWidth="2">
+    </mat-spinner>
+    
+    <!-- Left Icon -->
+    <mat-icon 
+      *ngIf="icon && iconPosition === 'left' && !loading" 
+      class="app-button__icon app-button__icon--left">
+      {{ icon }}
+    </mat-icon>
+    
+    <!-- Button Content -->
+    <span class="app-button__content" [class.app-button__content--hidden]="loading">
+      <ng-content></ng-content>
+    </span>
+    
+    <!-- Right Icon -->
+    <mat-icon 
+      *ngIf="icon && iconPosition === 'right' && !loading" 
+      class="app-button__icon app-button__icon--right">
+      {{ icon }}
+    </mat-icon>
+    
+  </button>
+
+  <!-- Stroked Button -->
+  <button 
+    [ngClass]="getButtonClass()"
+    [type]="type"
+    [disabled]="disabled || loading"
+    [matTooltip]="tooltip"
+    [attr.aria-label]="ariaLabel || tooltip"
+    [color]="getMaterialColor()"
+    mat-stroked-button
+    *ngSwitchCase="'mat-stroked-button'"
+    (click)="onButtonClick($event)">
+    
+    <!-- Loading Spinner -->
+    <mat-spinner 
+      *ngIf="loading" 
+      class="app-button__spinner"
+      diameter="16"
+      strokeWidth="2">
+    </mat-spinner>
+    
+    <!-- Left Icon -->
+    <mat-icon 
+      *ngIf="icon && iconPosition === 'left' && !loading" 
+      class="app-button__icon app-button__icon--left">
+      {{ icon }}
+    </mat-icon>
+    
+    <!-- Button Content -->
+    <span class="app-button__content" [class.app-button__content--hidden]="loading">
+      <ng-content></ng-content>
+    </span>
+    
+    <!-- Right Icon -->
+    <mat-icon 
+      *ngIf="icon && iconPosition === 'right' && !loading" 
+      class="app-button__icon app-button__icon--right">
+      {{ icon }}
+    </mat-icon>
+    
+  </button>
+
+  <!-- Regular Button -->
+  <button 
+    [ngClass]="getButtonClass()"
+    [type]="type"
+    [disabled]="disabled || loading"
+    [matTooltip]="tooltip"
+    [attr.aria-label]="ariaLabel || tooltip"
+    [color]="getMaterialColor()"
+    mat-button
+    *ngSwitchDefault
+    (click)="onButtonClick($event)">
+    
+    <!-- Loading Spinner -->
+    <mat-spinner 
+      *ngIf="loading" 
+      class="app-button__spinner"
+      diameter="16"
+      strokeWidth="2">
+    </mat-spinner>
+    
+    <!-- Left Icon -->
+    <mat-icon 
+      *ngIf="icon && iconPosition === 'left' && !loading" 
+      class="app-button__icon app-button__icon--left">
+      {{ icon }}
+    </mat-icon>
+    
+    <!-- Button Content -->
+    <span class="app-button__content" [class.app-button__content--hidden]="loading">
+      <ng-content></ng-content>
+    </span>
+    
+    <!-- Right Icon -->
+    <mat-icon 
+      *ngIf="icon && iconPosition === 'right' && !loading" 
+      class="app-button__icon app-button__icon--right">
+      {{ icon }}
+    </mat-icon>
+    
+  </button>
+
+</ng-container>

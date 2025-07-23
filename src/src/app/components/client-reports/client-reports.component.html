@@ -1,0 +1,377 @@
+<app-main-layout>
+  
+  <!-- Reports Actions Toolbar -->
+  <div slot="toolbar" class="reports-actions">
+    <app-button 
+      variant="accent" 
+      icon="download"
+      [disabled]="isExporting"
+      [loading]="isExporting"
+      (click)="exportDetailedReport()" 
+      class="mr-2">
+      <span class="hide-on-mobile ml-2">
+        {{ isExporting ? 'Exporting...' : 'Export Report' }}
+      </span>
+    </app-button>
+    
+    <app-button 
+      variant="secondary"
+      icon="arrow_back"
+      (click)="goToDashboard()">
+      <span class="hide-on-mobile ml-2">Dashboard</span>
+    </app-button>
+  </div>
+
+  <!-- Reports Content -->
+  <div class="reports-content">
+    
+    <!-- Page Header -->
+    <div class="reports-header section--compact">
+      <h1 class="reports-title">Advanced Reports</h1>
+      <p class="reports-subtitle">Detailed analytics and data visualization</p>
+    </div>
+
+    <!-- Filters Section -->
+    <mat-card class="mb-6 mat-elevation-z1">
+      <mat-card-header>
+        <mat-card-title class="flex items-center">
+          <mat-icon class="mr-2">filter_alt</mat-icon>
+          Report Filters
+        </mat-card-title>
+      </mat-card-header>
+      
+      <mat-card-content class="pt-4">
+        <div class="grid gap-4 lg:grid-cols-3">
+          <!-- Date Range Filter -->
+          <div class="flex flex-col">
+            <mat-form-field appearance="outline" class="w-full">
+              <mat-label>Time Period</mat-label>
+              <mat-select [(ngModel)]="selectedPeriod" (ngModelChange)="applyFilters()">
+                <mat-option value="thisWeek">This Week</mat-option>
+                <mat-option value="lastWeek">Last Week</mat-option>
+                <mat-option value="thisMonth">This Month</mat-option>
+                <mat-option value="lastMonth">Last Month</mat-option>
+                <mat-option value="custom">Custom Range</mat-option>
+              </mat-select>
+            </mat-form-field>
+            
+            <!-- Custom Date Range -->
+            <div *ngIf="selectedPeriod === 'custom'" class="grid grid-cols-2 gap-3 mt-2">
+              <mat-form-field appearance="outline">
+                <mat-label>From Date</mat-label>
+                <input matInput type="date" [(ngModel)]="customStartDate" 
+                       (ngModelChange)="applyFilters()">
+                <mat-icon matSuffix>calendar_today</mat-icon>
+              </mat-form-field>
+              
+              <mat-form-field appearance="outline">
+                <mat-label>To Date</mat-label>
+                <input matInput type="date" [(ngModel)]="customEndDate" 
+                       (ngModelChange)="applyFilters()">
+                <mat-icon matSuffix>calendar_today</mat-icon>
+              </mat-form-field>
+            </div>
+            
+            <div class="text-xs text-gray-500 mt-2 flex items-center">
+              <mat-icon class="text-sm mr-1">date_range</mat-icon>
+              {{ getCurrentPeriodText() }}
+            </div>
+          </div>
+
+          <!-- Worker Filter -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Workers</mat-label>
+            <mat-select [(ngModel)]="selectedWorkers" multiple (ngModelChange)="applyFilters()">
+              <mat-option value="all">All Workers</mat-option>
+              <mat-option *ngFor="let worker of workers" [value]="worker.contractorId">
+                {{ worker.name }}
+              </mat-option>
+            </mat-select>
+            <mat-hint>{{ selectedWorkers.length }} of {{ workers.length }} selected</mat-hint>
+          </mat-form-field>
+
+          <!-- Status Filter -->
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Entry Status</mat-label>
+            <mat-select [(ngModel)]="selectedStatuses" multiple (ngModelChange)="applyFilters()">
+              <mat-option value="approved">Approved</mat-option>
+              <mat-option value="submitted">Submitted</mat-option>
+              <mat-option value="rejected">Rejected</mat-option>
+              <mat-option value="draft">Draft</mat-option>
+            </mat-select>
+            <mat-hint>{{ selectedStatuses.length }} status{{ selectedStatuses.length !== 1 ? 'es' : '' }} selected</mat-hint>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- View Navigation Tabs -->
+    <mat-tab-group [selectedIndex]="getSelectedTabIndex()" (selectedTabChange)="onTabChange($event.index)" class="mb-6">
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="mr-2">summarize</mat-icon>
+          Summary
+        </ng-template>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="mr-2">list</mat-icon>
+          Detailed
+        </ng-template>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="mr-2">bar_chart</mat-icon>
+          Charts
+        </ng-template>
+      </mat-tab>
+    </mat-tab-group>
+
+    <!-- Summary Statistics -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+      <mat-card class="stat-card text-center mat-elevation-z2">
+        <mat-card-content class="p-6">
+          <div class="text-4xl font-bold text-primary mb-3">{{ dateRangeStats.totalWorkers }}</div>
+          <div class="text-lg font-medium text-gray-700">Active Workers</div>
+          <div class="text-sm text-primary mt-2 flex items-center justify-center">
+            <mat-icon class="text-sm mr-1">people</mat-icon>
+            Total
+          </div>
+        </mat-card-content>
+      </mat-card>
+      
+      <mat-card class="stat-card text-center mat-elevation-z2">
+        <mat-card-content class="p-6">
+          <div class="text-4xl font-bold text-gray-900 mb-3">{{ formatHours(dateRangeStats.totalHours) }}h</div>
+          <div class="text-lg font-medium text-gray-700">Total Hours</div>
+          <div class="text-sm text-gray-600 mt-2 flex items-center justify-center">
+            <mat-icon class="text-sm mr-1">schedule</mat-icon>
+            All Time
+          </div>
+        </mat-card-content>
+      </mat-card>
+      
+      <mat-card class="stat-card text-center mat-elevation-z2">
+        <mat-card-content class="p-6">
+          <div class="text-4xl font-bold text-green-600 mb-3">{{ formatHours(dateRangeStats.totalApproved) }}h</div>
+          <div class="text-lg font-medium text-gray-700">Approved Hours</div>
+          <div class="text-sm text-green-600 mt-2 flex items-center justify-center">
+            <mat-icon class="text-sm mr-1">check_circle</mat-icon>
+            Complete
+          </div>
+        </mat-card-content>
+      </mat-card>
+      
+      <mat-card class="stat-card text-center mat-elevation-z2">
+        <mat-card-content class="p-6">
+          <div class="text-4xl font-bold text-orange-600 mb-3">{{ formatHours(dateRangeStats.totalPending) }}h</div>
+          <div class="text-lg font-medium text-gray-700">Pending Hours</div>
+          <div class="text-sm text-orange-600 mt-2 flex items-center justify-center">
+            <mat-icon class="text-sm mr-1">pending</mat-icon>
+            Review
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Summary View -->
+    <div *ngIf="selectedView === 'summary'" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-lg font-semibold">Worker Summary</h3>
+        <div class="text-sm text-gray-600">
+          {{ workerReports.length }} workers • Average: {{ formatHours(dateRangeStats.averageHoursPerWorker) }}h per worker
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="border-b border-gray-200">
+              <th class="text-left py-3 px-4 font-medium text-gray-900">Worker</th>
+              <th class="text-left py-3 px-4 font-medium text-gray-900">Total Hours</th>
+              <th class="text-left py-3 px-4 font-medium text-gray-900">Approved</th>
+              <th class="text-left py-3 px-4 font-medium text-gray-900">Pending</th>
+              <th class="text-left py-3 px-4 font-medium text-gray-900">Rejected</th>
+              <th class="text-left py-3 px-4 font-medium text-gray-900">Entries</th>
+              <th class="text-left py-3 px-4 font-medium text-gray-900">Progress</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let report of workerReports" class="border-b border-gray-100 hover:bg-gray-50">
+              <td class="py-3 px-4">
+                <div class="flex items-center space-x-2">
+                  <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                    <span class="text-xs font-medium">{{ getInitials(report.worker.name) }}</span>
+                  </div>
+                  <div>
+                    <div class="font-medium">{{ report.worker.name }}</div>
+                    <div class="text-xs text-gray-500">{{ report.worker.email }}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="py-3 px-4 font-bold">{{ formatHours(report.totalHours) }}h</td>
+              <td class="py-3 px-4 text-green-600 font-medium">{{ formatHours(report.approvedHours) }}h</td>
+              <td class="py-3 px-4 text-yellow-600 font-medium">{{ formatHours(report.pendingHours) }}h</td>
+              <td class="py-3 px-4 text-red-600 font-medium">{{ formatHours(report.rejectedHours) }}h</td>
+              <td class="py-3 px-4 text-gray-600">{{ report.entriesCount }}</td>
+              <td class="py-3 px-4">
+                <div class="w-24 bg-gray-200 rounded-full h-2">
+                  <div class="bg-green-500 h-2 rounded-full" 
+                       [style.width.%]="getPercentage(report.approvedHours, report.totalHours)"></div>
+                </div>
+                <div class="text-xs text-gray-500 mt-1">
+                  {{ getPercentage(report.approvedHours, report.totalHours) | number:'1.0-0' }}% approved
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div *ngIf="workerReports.length === 0" class="text-center py-8">
+        <span class="text-6xl mb-4 block">📊</span>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">No Data Found</h3>
+        <p class="text-gray-600">No time entries match your current filters.</p>
+      </div>
+    </div>
+
+    <!-- Detailed View -->
+    <div *ngIf="selectedView === 'detailed'" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-lg font-semibold">Detailed Time Entries</h3>
+        <div class="text-sm text-gray-600">{{ filteredEntries.length }} entries</div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="border-b border-gray-200">
+              <th class="text-left py-3 px-4 font-medium text-gray-900">Date</th>
+              <th class="text-left py-3 px-4 font-medium text-gray-900">Worker</th>
+              <th class="text-left py-3 px-4 font-medium text-gray-900">Hours</th>
+              <th class="text-left py-3 px-4 font-medium text-gray-900">Type</th>
+              <th class="text-left py-3 px-4 font-medium text-gray-900">Description</th>
+              <th class="text-left py-3 px-4 font-medium text-gray-900">Proof</th>
+              <th class="text-left py-3 px-4 font-medium text-gray-900">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let entry of filteredEntries" class="border-b border-gray-100 hover:bg-gray-50">
+              <td class="py-3 px-4 text-sm">{{ formatDate(entry.date) }}</td>
+              <td class="py-3 px-4">
+                <div class="flex items-center space-x-2">
+                  <div class="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center">
+                    <span class="text-xs font-medium">
+                      {{ getInitials(getWorkerName(entry.workerId)) }}
+                    </span>
+                  </div>
+                  <span class="text-sm font-medium">
+                    {{ getWorkerName(entry.workerId) }}
+                  </span>
+                </div>
+              </td>
+              <td class="py-3 px-4 font-medium">{{ formatHours(getEntryHours(entry)) }}h</td>
+              <td class="py-3 px-4">
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
+                      [class]="entry.startTime ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'">
+                  {{ entry.startTime ? 'Clock' : 'Manual' }}
+                </span>
+              </td>
+              <td class="py-3 px-4 text-gray-600 text-sm max-w-xs truncate">
+                {{ entry.description || '—' }}
+              </td>
+              <td class="py-3 px-4 text-sm">
+                <span *ngIf="entry.proofOfWork.length > 0" class="text-ontop-pink">
+                  📎 {{ entry.proofOfWork.length }}
+                </span>
+                <span *ngIf="entry.proofOfWork.length === 0" class="text-gray-400">—</span>
+              </td>
+              <td class="py-3 px-4">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                      [class]="getStatusClass(entry.status)">
+                  {{ entry.status }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div *ngIf="filteredEntries.length === 0" class="text-center py-8">
+        <span class="text-6xl mb-4 block">📋</span>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">No Entries Found</h3>
+        <p class="text-gray-600">No time entries match your current filters.</p>
+      </div>
+    </div>
+
+    <!-- Charts View -->
+    <div *ngIf="selectedView === 'charts'" class="charts-view">
+      
+      <!-- Charts Grid -->
+      <div class="charts-grid">
+        
+        <!-- Hours by Status Chart -->
+        <mat-card class="chart-card mat-elevation-z2">
+          <mat-card-header class="chart-header">
+            <mat-card-title class="chart-title">
+              <mat-icon class="chart-title-icon">donut_small</mat-icon>
+              Hours by Status
+            </mat-card-title>
+            <mat-card-subtitle>Breakdown of approved, pending, and rejected hours</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content class="chart-content">
+            <app-simple-chart
+              [data]="statusBreakdownChartData"
+              [config]="getStatusChartConfig()">
+            </app-simple-chart>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Top Workers Chart -->
+        <mat-card class="chart-card mat-elevation-z2">
+          <mat-card-header class="chart-header">
+            <mat-card-title class="chart-title">
+              <mat-icon class="chart-title-icon">people</mat-icon>
+              Top Workers
+            </mat-card-title>
+            <mat-card-subtitle>Most productive workers by total hours</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content class="chart-content">
+            <app-simple-chart
+              [data]="workerHoursChartData"
+              [config]="getWorkerHoursChartConfig()">
+            </app-simple-chart>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Hours Over Time Chart -->
+        <mat-card class="chart-card chart-card--full-width mat-elevation-z2">
+          <mat-card-header class="chart-header">
+            <mat-card-title class="chart-title">
+              <mat-icon class="chart-title-icon">timeline</mat-icon>
+              Hours Over Time
+            </mat-card-title>
+            <mat-card-subtitle>Daily breakdown of working hours (last 7 days)</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content class="chart-content">
+            <app-simple-chart
+              [data]="hoursOverTimeChartData"
+              [config]="getTimeSeriesChartConfig()">
+            </app-simple-chart>
+          </mat-card-content>
+        </mat-card>
+
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="workerHoursChartData.length === 0 && statusBreakdownChartData.length === 0 && hoursOverTimeChartData.length === 0" class="charts-empty">
+        <mat-icon class="empty-icon">bar_chart</mat-icon>
+        <h3 class="empty-title">No Data to Visualize</h3>
+        <p class="empty-subtitle">Charts will appear here when time entries match your current filters.</p>
+      </div>
+
+    </div>
+
+  </div>
+  
+</app-main-layout>

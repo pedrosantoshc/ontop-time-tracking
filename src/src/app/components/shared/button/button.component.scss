@@ -1,0 +1,238 @@
+@import '../../../../styles/design-tokens.scss';
+
+.app-button {
+  // Minimal base styles - let Material Design handle appearance
+  position: relative;
+  
+  // Only override essential layout styles
+  white-space: nowrap;
+  
+  // Remove Material button styles conflicts
+  &.mat-mdc-button,
+  &.mat-mdc-raised-button,
+  &.mat-mdc-outlined-button {
+    .mdc-button__label {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+      width: 100%;
+    }
+  }
+
+  // Focus styles
+  &:focus-visible {
+    outline: 2px solid var(--color-primary-500);
+    outline-offset: 2px;
+  }
+
+  // Size variants
+  &--small {
+    height: 32px;
+    padding: 0 var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    
+    .app-button__icon {
+      width: 16px;
+      height: 16px;
+      font-size: 16px;
+    }
+    
+    .app-button__spinner {
+      width: 14px !important;
+      height: 14px !important;
+    }
+  }
+
+  &--medium {
+    height: 40px;
+    padding: 0 var(--spacing-md);
+    font-size: var(--font-size-base);
+    
+    .app-button__icon {
+      width: 18px;
+      height: 18px;
+      font-size: 18px;
+    }
+    
+    .app-button__spinner {
+      width: 16px !important;
+      height: 16px !important;
+    }
+  }
+
+  &--large {
+    height: 48px;
+    padding: 0 var(--spacing-lg);
+    font-size: var(--font-size-lg);
+    
+    .app-button__icon {
+      width: 20px;
+      height: 20px;
+      font-size: 20px;
+    }
+    
+    .app-button__spinner {
+      width: 18px !important;
+      height: 18px !important;
+    }
+  }
+
+  // Variant styles
+  // Let Material Design handle primary, secondary, accent, warn, and success variants
+  // Remove custom styling that overrides Material Design appearance
+
+  &--ghost {
+    background: transparent;
+    color: var(--color-text-primary);
+    
+    &:hover:not(:disabled) {
+      background: var(--color-background-hover);
+    }
+    
+    &:active:not(:disabled) {
+      background: var(--color-background-subtle);
+    }
+  }
+
+  &--link {
+    background: transparent;
+    color: var(--color-primary-500);
+    text-decoration: underline;
+    padding: var(--spacing-xs);
+    height: auto;
+    
+    &:hover:not(:disabled) {
+      color: var(--color-primary-600);
+      background: transparent;
+    }
+    
+    &:active:not(:disabled) {
+      color: var(--color-primary-700);
+    }
+  }
+
+  // State styles
+  &--disabled,
+  &:disabled {
+    background: var(--color-neutral-200) !important;
+    color: var(--color-text-disabled) !important;
+    cursor: not-allowed;
+    box-shadow: none !important;
+    border-color: var(--color-neutral-200) !important;
+    
+    &.app-button--secondary,
+    &.app-button--ghost,
+    &.app-button--link {
+      background: transparent !important;
+      color: var(--color-text-disabled) !important;
+      border-color: var(--color-text-disabled) !important;
+    }
+  }
+
+  &--loading {
+    pointer-events: none;
+    
+    .app-button__content {
+      opacity: 0.7;
+    }
+  }
+
+  &--full-width {
+    width: 100%;
+  }
+
+  // Icon positioning
+  &--with-icon {
+    &.app-button--icon-left {
+      .app-button__icon--left {
+        margin-right: var(--spacing-xxs);
+      }
+    }
+    
+    &.app-button--icon-right {
+      .app-button__icon--right {
+        margin-left: var(--spacing-xxs);
+      }
+    }
+  }
+}
+
+// Button content and icon styles
+.app-button__content {
+  display: flex;
+  align-items: center;
+  transition: opacity var(--transition-base);
+  
+  &--hidden {
+    opacity: 0;
+  }
+}
+
+.app-button__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.app-button__spinner {
+  position: absolute !important;
+  color: currentColor;
+  
+  .mat-mdc-progress-spinner {
+    --mdc-circular-progress-active-indicator-color: currentColor;
+  }
+  
+  circle {
+    stroke: currentColor !important;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 480px) {
+  .app-button {
+    &--large {
+      height: 44px;
+      font-size: var(--font-size-base);
+    }
+    
+    &--medium {
+      height: 36px;
+      padding: 0 var(--spacing-sm);
+    }
+    
+    &--small {
+      height: 30px;
+      padding: 0 var(--spacing-xs);
+      font-size: var(--font-size-xs);
+    }
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .app-button {
+    border-width: 2px;
+    
+    &:focus-visible {
+      outline-width: 3px;
+    }
+    
+    &--primary {
+      border: 2px solid var(--color-primary-700);
+    }
+    
+    &--secondary {
+      border-width: 2px;
+    }
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .app-button,
+  .app-button__content,
+  .app-button__spinner {
+    transition: none !important;
+  }
+}

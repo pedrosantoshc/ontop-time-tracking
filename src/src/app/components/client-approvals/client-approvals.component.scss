@@ -1,0 +1,126 @@
+.approvals-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-4);
+}
+
+.section {
+  margin-bottom: var(--spacing-6);
+}
+
+.header-card {
+  background: var(--color-background);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--border-radius-lg);
+}
+
+.approvals-header {
+  padding: var(--spacing-6);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  gap: var(--spacing-4);
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.title-section {
+  flex: 1;
+}
+
+.page-title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  margin: 0;
+  font-size: var(--text-2xl);
+  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+}
+
+.title-icon {
+  color: var(--color-primary);
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+}
+
+.page-subtitle {
+  margin: var(--spacing-2) 0 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--text-base);
+}
+
+.action-buttons {
+  display: flex;
+  gap: var(--spacing-3);
+  align-items: center;
+  
+  @media (max-width: 768px) {
+    justify-content: flex-start;
+    margin-top: var(--spacing-4);
+  }
+}
+
+.nav-button {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-4);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  background: var(--color-background);
+  transition: all var(--transition-base);
+  
+  &:hover {
+    background: var(--color-background-hover);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+  
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+  
+  .button-text {
+    @media (max-width: 640px) {
+      display: none;
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .approvals-content {
+    padding: 0 var(--spacing-3);
+  }
+  
+  .section {
+    margin-bottom: var(--spacing-4);
+  }
+}
+
+@media (max-width: 480px) {
+  .page-title {
+    font-size: var(--text-xl);
+    
+    .title-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+  }
+  
+  .page-subtitle {
+    font-size: var(--text-sm);
+  }
+}

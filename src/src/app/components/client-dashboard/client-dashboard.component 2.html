@@ -1,0 +1,318 @@
+<div class="min-h-screen bg-ontop-gray">
+  <!-- Material Toolbar Header -->
+  <mat-toolbar color="primary" class="mat-elevation-z2">
+    <mat-icon class="mr-3">business</mat-icon>
+    <span class="text-xl font-bold mr-2">ontop</span>
+    <span class="text-sm opacity-80">Time Tracking Dashboard</span>
+    
+    <span class="flex-spacer"></span>
+    
+    <button mat-raised-button color="accent" (click)="goToReports()" class="mr-2">
+      <mat-icon>assessment</mat-icon>
+      <span class="hide-on-mobile ml-2">Reports</span>
+    </button>
+    
+    <button mat-stroked-button (click)="exportConsolidatedReport()" 
+            [disabled]="isExporting" class="mr-2">
+      <mat-icon>download</mat-icon>
+      <span class="hide-on-mobile ml-2">{{ isExporting ? 'Exporting...' : 'Export' }}</span>
+    </button>
+    
+    <button mat-button (click)="resetTimeData()" color="warn" class="mr-2">
+      <mat-icon>delete</mat-icon>
+      <span class="hide-on-mobile ml-2">Reset</span>
+    </button>
+    
+    <button mat-button (click)="goToSetup()">
+      <mat-icon>settings</mat-icon>
+      <span class="hide-on-mobile ml-2">Settings</span>
+    </button>
+  </mat-toolbar>
+
+  <div class="max-w-6xl mx-auto p-4">
+
+    <!-- Summary Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+      <mat-card class="stat-card text-center mat-elevation-z2" (click)="showAllWorkers()">
+        <mat-card-content class="p-6">
+          <div class="text-4xl font-bold text-primary mb-3">{{ workers.length }}</div>
+          <div class="text-lg font-medium text-gray-700">Total Workers</div>
+          <div class="text-sm text-primary mt-2 flex items-center justify-center">
+            <mat-icon class="text-sm mr-1">visibility</mat-icon>
+            View All
+          </div>
+        </mat-card-content>
+      </mat-card>
+      
+      <mat-card class="stat-card text-center mat-elevation-z2" (click)="toggleApprovalsPanel()">
+        <mat-card-content class="p-6">
+          <div class="text-4xl font-bold text-orange-600 mb-3">{{ getTotalPendingHours() }}</div>
+          <div class="text-lg font-medium text-gray-700">Pending Hours</div>
+          <div class="text-sm text-orange-600 mt-2 flex items-center justify-center">
+            <mat-icon class="text-sm mr-1">pending_actions</mat-icon>
+            Review
+          </div>
+        </mat-card-content>
+      </mat-card>
+      
+      <mat-card class="stat-card text-center mat-elevation-z2">
+        <mat-card-content class="p-6">
+          <div class="text-4xl font-bold text-green-600 mb-3">{{ getTotalApprovedHours() }}</div>
+          <div class="text-lg font-medium text-gray-700">Approved Hours</div>
+          <div class="text-sm text-green-600 mt-2 flex items-center justify-center">
+            <mat-icon class="text-sm mr-1">check_circle</mat-icon>
+            Complete
+          </div>
+        </mat-card-content>
+      </mat-card>
+      
+      <mat-card class="stat-card text-center mat-elevation-z2">
+        <mat-card-content class="p-6">
+          <div class="text-4xl font-bold text-blue-600 mb-3">{{ getActiveWorkersCount() }}</div>
+          <div class="text-lg font-medium text-gray-700">Active Workers</div>
+          <div class="text-sm text-blue-600 mt-2 flex items-center justify-center">
+            <mat-icon class="text-sm mr-1">people</mat-icon>
+            Online
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Filters -->
+    <mat-card class="mb-6 mat-elevation-z1">
+      <mat-card-content class="p-6">
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between space-y-4 md:space-y-0 md:space-x-6">
+          <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+            <mat-form-field appearance="outline" class="min-w-40">
+              <mat-label>Time Period</mat-label>
+              <mat-select [(ngModel)]="selectedPeriod" (ngModelChange)="generateWorkerReports()">
+                <mat-option value="thisWeek">This Week</mat-option>
+                <mat-option value="lastWeek">Last Week</mat-option>
+                <mat-option value="thisMonth">This Month</mat-option>
+                <mat-option value="lastMonth">Last Month</mat-option>
+                <mat-option value="custom">Custom Range</mat-option>
+              </mat-select>
+            </mat-form-field>
+            
+            <div *ngIf="selectedPeriod === 'custom'" class="flex space-x-3">
+              <mat-form-field appearance="outline">
+                <mat-label>From Date</mat-label>
+                <input matInput type="date" [(ngModel)]="customStartDate" 
+                       (ngModelChange)="generateWorkerReports()">
+                <mat-icon matSuffix>calendar_today</mat-icon>
+              </mat-form-field>
+              
+              <mat-form-field appearance="outline">
+                <mat-label>To Date</mat-label>
+                <input matInput type="date" [(ngModel)]="customEndDate" 
+                       (ngModelChange)="generateWorkerReports()">
+                <mat-icon matSuffix>calendar_today</mat-icon>
+              </mat-form-field>
+            </div>
+          </div>
+          
+          <div class="text-sm text-gray-600 font-medium flex items-center">
+            <mat-icon class="text-sm mr-2">date_range</mat-icon>
+            {{ getCurrentPeriodText() }}
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Worker Reports Table (Consolidated) -->
+    <div class="card-ontop">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-lg font-semibold">Worker Hours Summary</h3>
+        <div class="text-sm text-gray-600">
+          {{ workerReports.length }} workers • {{ getTotalHours() }} total hours
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="border-b border-gray-200">
+              <th class="text-left py-3 px-4 font-medium text-gray-900">Reference</th>
+              <th class="text-left py-3 px-4 font-medium text-gray-900">Worker Name</th>
+              <th class="text-left py-3 px-4 font-medium text-gray-900">Email</th>
+              <th class="text-left py-3 px-4 font-medium text-gray-900">Approved Hours</th>
+              <th class="text-left py-3 px-4 font-medium text-gray-900">Pending Hours</th>
+              <th class="text-left py-3 px-4 font-medium text-gray-900">Total Hours</th>
+              <th class="text-left py-3 px-4 font-medium text-gray-900">Last Activity</th>
+              <th class="text-left py-3 px-4 font-medium text-gray-900">Status</th>
+              <th class="text-left py-3 px-4 font-medium text-gray-900">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let report of workerReports" class="border-b border-gray-100 hover:bg-gray-50">
+              <td class="py-3 px-4 font-mono text-sm">{{ report.reference }}</td>
+              <td class="py-3 px-4">
+                <div class="flex items-center space-x-2">
+                  <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                    <span class="text-xs font-medium">{{ getWorkerInitials(report.workerName) }}</span>
+                  </div>
+                  <span class="font-medium">{{ report.workerName }}</span>
+                </div>
+              </td>
+              <td class="py-3 px-4 text-gray-600">{{ report.email }}</td>
+              <td class="py-3 px-4">
+                <span class="font-medium text-green-600">{{ formatHours(report.approvedHours) }}h</span>
+              </td>
+              <td class="py-3 px-4">
+                <span class="font-medium text-yellow-600">{{ formatHours(report.pendingHours) }}h</span>
+              </td>
+              <td class="py-3 px-4">
+                <span class="font-bold text-gray-900">{{ formatHours(report.totalHours) }}h</span>
+              </td>
+              <td class="py-3 px-4 text-gray-600">{{ formatDate(report.lastActivity) }}</td>
+              <td class="py-3 px-4">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                      [class]="getWorkerStatusClass(report)">
+                  {{ report.status }}
+                </span>
+              </td>
+              <td class="py-3 px-4">
+                <button 
+                  (click)="viewWorkerDetails(report.reference)"
+                  class="text-ontop-blue hover:text-blue-600 text-sm font-medium">
+                  👁️ View Entries
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div *ngIf="workerReports.length === 0" class="text-center py-8">
+        <span class="text-6xl mb-4 block">📊</span>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">No Time Data</h3>
+        <p class="text-gray-600">No time entries found for the selected period.</p>
+      </div>
+    </div>
+
+    <!-- Individual Entries (when viewing worker details) -->
+    <div *ngIf="selectedWorkerEntries.length > 0" class="card-ontop mt-6">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold">Individual Time Entries - {{ getSelectedWorkerName() }}</h3>
+        <button (click)="clearWorkerSelection()" class="text-gray-600 hover:text-gray-800">
+          ✕ Close
+        </button>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="border-b border-gray-200">
+              <th class="text-left py-3 px-4 font-medium text-gray-900">Date</th>
+              <th class="text-left py-3 px-4 font-medium text-gray-900">Hours</th>
+              <th class="text-left py-3 px-4 font-medium text-gray-900">Type</th>
+              <th class="text-left py-3 px-4 font-medium text-gray-900">Description</th>
+              <th class="text-left py-3 px-4 font-medium text-gray-900">Status</th>
+              <th class="text-left py-3 px-4 font-medium text-gray-900">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let entry of selectedWorkerEntries" class="border-b border-gray-100">
+              <td class="py-3 px-4">{{ formatDate(entry.date) }}</td>
+              <td class="py-3 px-4 font-medium">{{ getEntryHours(entry) }}h</td>
+              <td class="py-3 px-4">
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                      [class]="entry.startTime ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'">
+                  {{ entry.startTime ? 'Clock' : 'Manual' }}
+                </span>
+              </td>
+              <td class="py-3 px-4 text-gray-600">{{ entry.description || 'No description' }}</td>
+              <td class="py-3 px-4">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                      [class]="getStatusClass(entry.status)">
+                  {{ entry.status }}
+                </span>
+              </td>
+              <td class="py-3 px-4">
+                <div class="flex items-center space-x-2">
+                  <button 
+                    *ngIf="entry.status !== 'approved'"
+                    (click)="approveEntry(entry)" 
+                    class="text-green-600 hover:text-green-800 text-sm">
+                    ✅
+                  </button>
+                  <button 
+                    *ngIf="entry.status !== 'rejected'"
+                    (click)="rejectEntry(entry)" 
+                    class="text-red-600 hover:text-red-800 text-sm">
+                    ❌
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      </div>
+
+  <!-- Pending Approvals Panel -->
+  <app-pending-approvals *ngIf="showApprovalsPanel" (close)="toggleApprovalsPanel()"></app-pending-approvals>
+
+  <!-- All Workers Panel -->
+  <div *ngIf="selectedWorkerId === 'all_workers'" class="card-ontop mt-6">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-semibold">All Workers ({{ workers.length }})</h3>
+      <button (click)="clearWorkerSelection()" class="text-gray-600 hover:text-gray-800">
+        ✕ Close
+      </button>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead>
+          <tr class="border-b border-gray-200">
+            <th class="text-left py-3 px-4 font-medium text-gray-900">Name</th>
+            <th class="text-left py-3 px-4 font-medium text-gray-900">Email</th>
+            <th class="text-left py-3 px-4 font-medium text-gray-900">Contractor ID</th>
+            <th class="text-left py-3 px-4 font-medium text-gray-900">Tracking Mode</th>
+            <th class="text-left py-3 px-4 font-medium text-gray-900">Status</th>
+            <th class="text-left py-3 px-4 font-medium text-gray-900">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let worker of workers" class="border-b border-gray-100 hover:bg-gray-50">
+            <td class="py-3 px-4">
+              <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                  <span class="text-xs font-medium">{{ getWorkerInitials(worker.name) }}</span>
+                </div>
+                <span class="font-medium">{{ worker.name }}</span>
+              </div>
+            </td>
+            <td class="py-3 px-4 text-gray-600">{{ worker.email }}</td>
+            <td class="py-3 px-4 text-gray-600 font-mono">{{ worker.contractorId }}</td>
+            <td class="py-3 px-4">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                    [class]="worker.trackingMode === 'clock' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'">
+                {{ worker.trackingMode === 'clock' ? 'Clock In/Out' : 'Timesheet' }}
+              </span>
+            </td>
+            <td class="py-3 px-4">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                    [class]="worker.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'">
+                {{ worker.isActive ? 'Active' : 'Invited' }}
+              </span>
+              <div *ngIf="worker.joinedAt" class="text-xs text-gray-500 mt-1">
+                Joined: {{ formatDate(worker.joinedAt) }}
+              </div>
+            </td>
+            <td class="py-3 px-4">
+              <button 
+                (click)="viewWorkerDetails(worker.contractorId)"
+                class="text-ontop-blue hover:text-blue-600 text-sm font-medium">
+                👁️ View Entries
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+</div>

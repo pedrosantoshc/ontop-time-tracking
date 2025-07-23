@@ -1,0 +1,241 @@
+<div class="advanced-data-table">
+
+  <!-- Table Controls -->
+  <div class="table-controls" *ngIf="config.showFilters || config.showExport">
+    
+    <!-- Filter Controls -->
+    <div class="table-controls__filters" *ngIf="config.showFilters">
+      <div class="filter-summary" *ngIf="hasActiveFilters()">
+        <mat-icon class="filter-icon">filter_list</mat-icon>
+        <span class="filter-text">{{ getActiveFilterCount() }} active filters</span>
+        <button mat-stroked-button size="small" (click)="clearAllFilters()" class="clear-filters-btn">
+          <mat-icon>clear</mat-icon>
+          Clear All
+        </button>
+      </div>
+    </div>
+    
+    <!-- Action Controls -->
+    <div class="table-controls__actions">
+      <button *ngIf="config.showExport" 
+              mat-stroked-button 
+              (click)="onExport()" 
+              class="export-btn">
+        <mat-icon>download</mat-icon>
+        <span class="hide-on-mobile">Export</span>
+      </button>
+      
+      <button mat-icon-button 
+              (click)="onRefresh()" 
+              matTooltip="Refresh data"
+              class="refresh-btn">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Column Filters Row -->
+  <div class="column-filters" *ngIf="config.showFilters">
+    <div class="column-filters__grid">
+      <!-- Selection column spacer -->
+      <div *ngIf="config.showSelection" class="filter-cell filter-cell--empty"></div>
+      
+      <!-- Filter inputs for each column -->
+      <div *ngFor="let column of columns" class="filter-cell">
+        <mat-form-field *ngIf="column.filterable !== false" 
+                        appearance="outline" 
+                        subscriptSizing="dynamic"
+                        class="filter-field">
+          
+          <!-- Text/Number input (only if no filterOptions provided) -->
+          <input *ngIf="(column.filterType || column.type) !== 'status' && !column.filterOptions" 
+                 matInput 
+                 [placeholder]="'Filter ' + column.label.toLowerCase()"
+                 [value]="columnFilters[column.key] || ''"
+                 (input)="applyColumnFilter(column.key, $any($event.target).value)">
+          
+          <!-- Generic dropdown select (for columns with filterOptions) -->
+          <mat-select *ngIf="column.filterOptions" 
+                      [value]="columnFilters[column.key] || ''"
+                      [placeholder]="'All ' + column.label.toLowerCase()"
+                      (selectionChange)="applyColumnFilter(column.key, $event.value)">
+            <mat-option value="">All</mat-option>
+            <mat-option *ngFor="let option of column.filterOptions" [value]="option.value">
+              {{ option.label }}
+            </mat-option>
+          </mat-select>
+          
+          <!-- Status select (for status columns with statusOptions) -->
+          <mat-select *ngIf="(column.filterType || column.type) === 'status' && column.statusOptions" 
+                      [value]="columnFilters[column.key] || ''"
+                      [placeholder]="'All ' + column.label.toLowerCase()"
+                      (selectionChange)="applyColumnFilter(column.key, $event.value)">
+            <mat-option value="">All</mat-option>
+            <mat-option *ngFor="let option of column.statusOptions" [value]="option.value">
+              {{ option.label }}
+            </mat-option>
+          </mat-select>
+          
+          <!-- Clear filter button -->
+          <button *ngIf="columnFilters[column.key]" 
+                  matSuffix 
+                  mat-icon-button 
+                  (click)="clearColumnFilter(column.key)"
+                  class="clear-filter-btn">
+            <mat-icon>clear</mat-icon>
+          </button>
+        </mat-form-field>
+      </div>
+      
+      <!-- Actions column spacer -->
+      <div *ngIf="actions.length > 0" class="filter-cell filter-cell--empty"></div>
+    </div>
+  </div>
+
+  <!-- Table Container -->
+  <div class="table-container" [class.table-container--loading]="loading">
+    
+    <!-- Loading Overlay -->
+    <div *ngIf="loading" class="loading-overlay">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p class="loading-text">{{ loadingMessage }}</p>
+    </div>
+
+    <!-- Data Table -->
+    <mat-table [dataSource]="dataSource" 
+               matSort 
+               class="data-table"
+               [class.data-table--dense]="config.dense"
+               [class.data-table--sticky-header]="config.stickyHeader"
+               *ngIf="!loading || dataSource.data.length > 0">
+
+      <!-- Selection Column -->
+      <ng-container matColumnDef="select" *ngIf="config.showSelection">
+        <mat-header-cell *matHeaderCellDef class="selection-cell">
+          <mat-checkbox (change)="masterToggle()"
+                        [checked]="isAllSelected()"
+                        [indeterminate]="isIndeterminate()"
+                        [disabled]="dataSource.data.length === 0">
+          </mat-checkbox>
+        </mat-header-cell>
+        <mat-cell *matCellDef="let row" class="selection-cell">
+          <mat-checkbox (click)="$event.stopPropagation()"
+                        (change)="toggleRow(row)"
+                        [checked]="isSelected(row)">
+          </mat-checkbox>
+        </mat-cell>
+      </ng-container>
+
+      <!-- Dynamic Data Columns -->
+      <ng-container *ngFor="let column of columns" [matColumnDef]="column.key">
+        
+        <!-- Header Cell -->
+        <mat-header-cell *matHeaderCellDef 
+                         [class]="'column-' + column.key + ' text-' + (column.align || 'left')"
+                         [style.width]="column.width">
+          <span *ngIf="column.sortable === false">{{ column.label }}</span>
+          <span *ngIf="column.sortable !== false" [mat-sort-header]="column.key">{{ column.label }}</span>
+        </mat-header-cell>
+        
+        <!-- Data Cell -->
+        <mat-cell *matCellDef="let row" 
+                  [class]="'column-' + column.key + ' text-' + (column.align || 'left')"
+                  [style.width]="column.width">
+          
+          <!-- Custom Template Slot -->
+          <ng-container *ngIf="column.type === 'custom' && column.key === 'workerName'">
+            <!-- Custom Worker Display -->
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center text-sm font-medium">
+                {{ getWorkerInitials(row.workerName) }}
+              </div>
+              <div>
+                <div class="font-medium text-gray-900">{{ row.workerName }}</div>
+                <div class="text-xs text-gray-500 font-mono">{{ row.reference }}</div>
+              </div>
+            </div>
+          </ng-container>
+          
+          <!-- Status Display -->
+          <mat-chip-set *ngIf="column.type === 'status'">
+            <mat-chip [class]="getStatusClass(getCellValue(row, column), column)" 
+                      disableRipple>
+              {{ getCellValue(row, column) }}
+            </mat-chip>
+          </mat-chip-set>
+          
+          <!-- Number Display -->
+          <span *ngIf="column.type === 'number'" class="number-cell">
+            {{ formatNumber(getCellValue(row, column)) }}
+          </span>
+          
+          <!-- Date Display -->
+          <span *ngIf="column.type === 'date'" class="date-cell">
+            {{ formatDate(getCellValue(row, column)) }}
+          </span>
+          
+          <!-- Default Text Display -->
+          <span *ngIf="!column.type || column.type === 'text'" class="text-cell">
+            {{ getCellValue(row, column) }}
+          </span>
+        </mat-cell>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions" *ngIf="actions.length > 0">
+        <mat-header-cell *matHeaderCellDef class="actions-cell">Actions</mat-header-cell>
+        <mat-cell *matCellDef="let row" class="actions-cell">
+          <div class="action-buttons">
+            <button *ngFor="let action of actions" 
+                    mat-icon-button 
+                    [color]="action.color || ''"
+                    [disabled]="action.disabled ? action.disabled(row) : false"
+                    [matTooltip]="action.tooltip || action.label"
+                    (click)="$event.stopPropagation(); action.handler(row)"
+                    class="action-btn">
+              <mat-icon>{{ action.icon }}</mat-icon>
+            </button>
+          </div>
+        </mat-cell>
+      </ng-container>
+
+      <!-- Table Rows -->
+      <mat-header-row *matHeaderRowDef="displayedColumns; sticky: config.stickyHeader"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns;" 
+               class="data-row"
+               [class.data-row--selected]="isSelected(row)"
+               (click)="onRowClick(row)"></mat-row>
+    </mat-table>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && dataSource.data.length === 0" class="empty-state">
+      <mat-icon class="empty-icon">inbox</mat-icon>
+      <h3 class="empty-title">{{ emptyMessage }}</h3>
+      <p class="empty-subtitle">There's no data to display at the moment.</p>
+      <button mat-raised-button color="primary" (click)="onRefresh()" class="empty-action">
+        <mat-icon>refresh</mat-icon>
+        Refresh Data
+      </button>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <mat-paginator *ngIf="config.showPagination && dataSource.data.length > 0"
+                 [pageSizeOptions]="config.pageSizeOptions || [5, 10, 25, 50]"
+                 [pageSize]="config.pageSize || 10"
+                 showFirstLastButtons
+                 class="table-paginator">
+  </mat-paginator>
+
+  <!-- Selection Summary -->
+  <div *ngIf="config.showSelection && selectedRows.size > 0" class="selection-summary">
+    <div class="selection-info">
+      <mat-icon>check_circle</mat-icon>
+      <span>{{ selectedRows.size }} item(s) selected</span>
+    </div>
+    <div class="selection-actions">
+      <ng-content select="[slot=bulk-actions]"></ng-content>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,51 @@
+/* Reports Header Styles */
+.reports-header {
+  margin-bottom: var(--spacing-xl);
+}
+
+.reports-title {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-xs) 0;
+  line-height: var(--line-height-tight);
+}
+
+.reports-subtitle {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: var(--line-height-relaxed);
+}
+
+/* Reports Actions in Toolbar */
+.reports-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+/* Reports Content Container */
+.reports-content {
+  /* Specific reports content styles if needed */
+}
+
+.stat-card {
+  transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-1px);
+}
+
+.max-w-7xl { 
+  max-width: 80rem; 
+}
+
+.grid-cols-4 { 
+  grid-template-columns: repeat(4, 1fr); 
+}
+
+.text-yellow-600 { 
+  color: var(--color-warning-600); 
+}
