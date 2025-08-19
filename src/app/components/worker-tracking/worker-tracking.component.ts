@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { StorageService } from '../../services/storage.service';
 import { Worker, TimeEntry, ProofOfWork } from '../../models/interfaces';
 import { v4 as uuidv4 } from 'uuid';
@@ -24,6 +24,10 @@ import { v4 as uuidv4 } from 'uuid';
               <p class="text-gray-600">Track your time and manage your work sessions</p>
             </div>
             <div class="text-right">
+              <button mat-stroked-button (click)="navigateToDashboard()" class="mb-2 flex items-center space-x-2">
+                <mat-icon>dashboard</mat-icon>
+                <span>My Dashboard</span>
+              </button>
               <p class="text-sm text-gray-600">Today's Total</p>
               <p class="text-2xl font-bold text-ontop-blue">{{ formatHours(todayTotal) }}h</p>
             </div>
@@ -645,6 +649,7 @@ export class WorkerTrackingComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private storage: StorageService
   ) {}
 
@@ -1168,6 +1173,12 @@ export class WorkerTrackingComponent implements OnInit, OnDestroy {
       this.errorMessage = error.message || 'Failed to update time entry';
     } finally {
       this.isProcessing = false;
+    }
+  }
+
+  navigateToDashboard() {
+    if (this.worker) {
+      this.router.navigate(['/worker-dashboard', this.worker.inviteToken]);
     }
   }
 

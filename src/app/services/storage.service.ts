@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Client, Worker, TimeEntry, ProofOfWork } from '../models/interfaces';
+import { Client, Worker, TimeEntry, ProofOfWork, WorkerDashboardEntry, WorkerStats } from '../models/interfaces';
 
 @Injectable({
   providedIn: 'root'
@@ -192,5 +192,99 @@ export class StorageService {
       total,
       percentage: (used / total) * 100
     };
+  }
+
+  // Worker Dashboard specific methods
+  getWorkerEntryHistory(workerId: string): WorkerDashboardEntry[] {
+    const entries = this.getTimeEntriesByWorker(workerId);
+    return entries.map(entry => this.mapToWorkerDashboardEntry(entry));
+  }
+
+  getWorkerStats(workerId: string): WorkerStats {
+    const entries = this.getTimeEntriesByWorker(workerId);
+    const now = new Date();
+    const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const stats: WorkerStats = {
+      totalHours: 0,
+      approvedHours: 0,
+      pendingHours: 0,
+      rejectedHours: 0,
+      entriesCount: {
+        total: entries.length,
+        approved: 0,
+        pending: 0,
+        rejected: 0
+      },
+      thisWeekHours: 0,
+      thisMonthHours: 0
+    };
+
+    entries.forEach(entry => {
+      const hours = this.calculateEntryHours(entry);
+      stats.totalHours += hours;
+
+      // Calculate hours by status
+      switch (entry.status) {
+        case 'approved':
+          stats.approvedHours += hours;
+          stats.entriesCount.approved++;
+          break;
+        case 'rejected':
+          stats.rejectedHours += hours;
+          stats.entriesCount.rejected++;
+          break;
+        case 'draft':
+        case 'submitted':
+          stats.pendingHours += hours;
+          stats.entriesCount.pending++;
+          break;
+      }
+
+      // Calculate weekly and monthly hours
+      const entryDate = new Date(entry.date);
+      if (entryDate >= startOfWeek) {
+        stats.thisWeekHours += hours;
+      }
+      if (entryDate >= startOfMonth) {
+        stats.thisMonthHours += hours;
+      }
+    });
+
+    return stats;
+  }
+
+  private mapToWorkerDashboardEntry(entry: TimeEntry): WorkerDashboardEntry {
+    const statusMap = {
+      draft: { icon: 'edit', color: 'text-gray-500', text: 'Draft' },
+      submitted: { icon: 'schedule', color: 'text-yellow-600', text: 'Pending Review' },
+      approved: { icon: 'check_circle', color: 'text-green-600', text: 'Approved' },
+      rejected: { icon: 'cancel', color: 'text-red-600', text: 'Rejected' }
+    };
+
+    const statusInfo = statusMap[entry.status];
+
+    return {
+      timeEntry: entry,
+      statusIcon: statusInfo.icon,
+      statusColor: statusInfo.color,
+      statusText: statusInfo.text,
+      submittedDate: entry.status !== 'draft' ? entry.date : undefined,
+      approvedDate: entry.status === 'approved' ? entry.date : undefined,
+      clientFeedback: entry.clientNotes
+    };
+  }
+
+  private calculateEntryHours(entry: TimeEntry): number {
+    if (entry.manualHours) {
+      return entry.manualHours;
+    }
+    if (entry.startTime && entry.endTime) {
+      const start = new Date(`${entry.date}T${entry.startTime}`);
+      const end = new Date(`${entry.date}T${entry.endTime}`);
+      return (end.getTime() - start.getTime()) / (1000 * 60 * 60); // Convert to hours
+    }
+    return 0;
   }
 } 

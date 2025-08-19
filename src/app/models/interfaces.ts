@@ -32,6 +32,9 @@ export interface TimeEntry {
   proofOfWork: ProofOfWork[];
   status: 'draft' | 'submitted' | 'approved' | 'rejected';
   clientNotes?: string;
+  editHistory?: EditRecord[];
+  lastModified?: string;
+  isEditable?: boolean;
 }
 
 export interface ProofOfWork {
@@ -68,4 +71,107 @@ export interface WorkerSummary {
   status: string;
   approvedDate?: string;
   clientNotes?: string;
+}
+
+// New interfaces for Worker Dashboard
+export interface WorkerDashboardEntry {
+  timeEntry: TimeEntry;
+  statusIcon: string;
+  statusColor: string;
+  statusText: string;
+  submittedDate?: string;
+  approvedDate?: string;
+  clientFeedback?: string;
+}
+
+export interface WorkerStats {
+  totalHours: number;
+  approvedHours: number;
+  pendingHours: number;
+  rejectedHours: number;
+  entriesCount: {
+    total: number;
+    approved: number;
+    pending: number;
+    rejected: number;
+  };
+  thisWeekHours: number;
+  thisMonthHours: number;
+}
+
+export interface StatusFilter {
+  key: string;
+  label: string;
+  color: string;
+  icon: string;
+}
+
+// Edit tracking interfaces
+export interface EditRecord {
+  timestamp: string;
+  field: string;
+  oldValue: any;
+  newValue: any;
+  reason?: string;
+  userId?: string;
+}
+
+// Reports interfaces
+export interface ReportConfig {
+  dateRange: { start: string; end: string };
+  workers: string[];
+  includeProofOfWork: boolean;
+  format: 'summary' | 'detailed';
+  status?: ('draft' | 'submitted' | 'approved' | 'rejected')[];
+}
+
+export interface ReportData {
+  summary: ReportSummary;
+  workerReports: WorkerReport[];
+  chartData: ChartData;
+  exportData: ExportData;
+}
+
+export interface ReportSummary {
+  totalHours: number;
+  totalWorkers: number;
+  totalEntries: number;
+  averageHoursPerWorker: number;
+  approvalRate: number;
+  periodStart: string;
+  periodEnd: string;
+}
+
+export interface WorkerReport {
+  workerId: string;
+  workerName: string;
+  workerEmail: string;
+  totalHours: number;
+  approvedHours: number;
+  pendingHours: number;
+  rejectedHours: number;
+  entriesCount: number;
+  averageHoursPerDay: number;
+  lastActivity: string;
+  proofOfWorkCount: number;
+}
+
+export interface ChartData {
+  hoursPerWorker: ChartDataPoint[];
+  hoursOverTime: ChartDataPoint[];
+  statusDistribution: ChartDataPoint[];
+  dailyHours: ChartDataPoint[];
+}
+
+export interface ChartDataPoint {
+  label: string;
+  value: number;
+  color?: string;
+}
+
+export interface ExportData {
+  format: 'csv' | 'excel' | 'pdf';
+  filename: string;
+  data: any;
+  headers: string[];
 } 

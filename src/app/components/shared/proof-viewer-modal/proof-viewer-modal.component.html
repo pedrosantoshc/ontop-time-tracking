@@ -1,0 +1,240 @@
+<!-- Modal Backdrop -->
+<div *ngIf="isVisible" class="modal-backdrop" (click)="onBackdropClick($event)">
+  
+  <!-- Modal Container -->
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="flex-1">
+        <h2 class="text-xl font-semibold text-gray-900">
+          <mat-icon class="inline-icon">visibility</mat-icon>
+          Review Time Entry
+        </h2>
+        <p class="text-sm text-gray-600 mt-1" *ngIf="timeEntry">
+          {{ formatDate(timeEntry.date) }} • {{ calculateHours() }} hours
+        </p>
+      </div>
+      <button 
+        (click)="closeModal()" 
+        class="close-button">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Modal Content -->
+    <div class="modal-content" *ngIf="timeEntry">
+      
+      <!-- Time Entry Details -->
+      <div class="entry-details">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div>
+            <h3 class="font-medium text-gray-900 mb-2">Time Period</h3>
+            <p class="text-sm text-gray-700" *ngIf="timeEntry.startTime && timeEntry.endTime">
+              {{ timeEntry.startTime }} - {{ timeEntry.endTime }}
+            </p>
+            <p class="text-sm text-gray-700" *ngIf="timeEntry.manualHours">
+              Manual Entry: {{ timeEntry.manualHours }} hours
+            </p>
+          </div>
+          <div>
+            <h3 class="font-medium text-gray-900 mb-2">Status</h3>
+            <span class="status-badge" [class]="'status-' + timeEntry.status">
+              {{ timeEntry.status | titlecase }}
+            </span>
+          </div>
+        </div>
+
+        <div class="mb-6" *ngIf="timeEntry.description">
+          <h3 class="font-medium text-gray-900 mb-2">Work Description</h3>
+          <p class="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg">
+            {{ timeEntry.description }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Proof of Work Section -->
+      <div class="proof-section" *ngIf="timeEntry.proofOfWork.length > 0">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-medium text-gray-900">
+            Proof of Work ({{ currentProofIndex + 1 }} of {{ timeEntry.proofOfWork.length }})
+          </h3>
+          <div class="proof-navigation" *ngIf="hasMultipleProofs">
+            <button 
+              (click)="previousProof()" 
+              [disabled]="isFirstProof"
+              mat-icon-button 
+              class="nav-button">
+              <mat-icon>chevron_left</mat-icon>
+            </button>
+            <button 
+              (click)="nextProof()" 
+              [disabled]="isLastProof"
+              mat-icon-button 
+              class="nav-button">
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Current Proof Display -->
+        <div class="proof-display" *ngIf="currentProof">
+          <div class="proof-info mb-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <mat-icon class="text-gray-600">{{ currentProof.type === 'screenshot' ? 'photo_camera' : 'attach_file' }}</mat-icon>
+                <span class="font-medium">{{ getProofTypeLabel(currentProof.type) }}</span>
+                <span class="text-sm text-gray-500" *ngIf="currentProof.fileName">
+                  {{ currentProof.fileName }}
+                </span>
+              </div>
+              <div class="text-sm text-gray-500">
+                {{ formatTime(currentProof.timestamp) }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Image Display -->
+          <div class="proof-content" *ngIf="isImageFile(currentProof)">
+            <div class="image-container">
+              <img 
+                [src]="currentProof.content" 
+                [alt]="currentProof.fileName || 'Proof of work'"
+                class="proof-image"
+                (error)="onImageError($event)"
+                />
+            </div>
+          </div>
+
+          <!-- File Info Display -->
+          <div class="proof-content" *ngIf="!isImageFile(currentProof)">
+            <div class="file-info">
+              <div class="file-icon">
+                <mat-icon class="text-gray-400 text-4xl">description</mat-icon>
+              </div>
+              <div class="file-details">
+                <p class="font-medium text-gray-900">{{ currentProof.fileName || 'Unknown File' }}</p>
+                <p class="text-sm text-gray-600">{{ getFileExtension(currentProof.fileName) }} File</p>
+                <p class="text-xs text-gray-500" *ngIf="currentProof.fileSize">
+                  {{ (currentProof.fileSize / 1024).toFixed(1) }} KB
+                </p>
+              </div>
+              <button 
+                (click)="downloadFile(currentProof)" 
+                mat-raised-button 
+                color="primary"
+                class="download-button">
+                <mat-icon>download</mat-icon>
+                Download
+              </button>
+            </div>
+          </div>
+
+          <!-- Proof Description -->
+          <div class="proof-description" *ngIf="currentProof.description">
+            <h4 class="font-medium text-gray-900 mb-2">Description</h4>
+            <p class="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg">
+              {{ currentProof.description }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- No Proof Message -->
+      <div class="no-proof-message" *ngIf="timeEntry.proofOfWork.length === 0">
+        <div class="text-center py-8">
+          <mat-icon class="text-gray-400 text-6xl mb-4">photo_camera_back</mat-icon>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">No Proof of Work</h3>
+          <p class="text-gray-600">This time entry doesn't have any attached proof of work.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer / Actions -->
+    <div class="modal-footer" *ngIf="timeEntry && timeEntry.status === 'submitted'">
+      <div class="flex items-center justify-between">
+        <div class="flex space-x-3">
+          <button 
+            (click)="showRejectModal()" 
+            [disabled]="isProcessing"
+            mat-stroked-button 
+            color="warn"
+            class="reject-button">
+            <mat-icon>cancel</mat-icon>
+            Reject
+          </button>
+          <button 
+            (click)="approveEntry()" 
+            [disabled]="isProcessing"
+            mat-raised-button 
+            color="primary"
+            class="approve-button">
+            <mat-icon>check_circle</mat-icon>
+            Approve
+          </button>
+        </div>
+        <button 
+          (click)="closeModal()" 
+          mat-stroked-button>
+          Close
+        </button>
+      </div>
+    </div>
+
+    <!-- Read-only Footer for non-submitted entries -->
+    <div class="modal-footer" *ngIf="timeEntry && timeEntry.status !== 'submitted'">
+      <div class="flex justify-end">
+        <button 
+          (click)="closeModal()" 
+          mat-raised-button 
+          color="primary">
+          Close
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Reject Modal -->
+<div *ngIf="showRejectForm" class="modal-backdrop" (click)="hideRejectModal()">
+  <div class="reject-modal" (click)="$event.stopPropagation()">
+    <div class="reject-header">
+      <h3 class="text-lg font-semibold text-gray-900">Reject Time Entry</h3>
+      <button (click)="hideRejectModal()" class="close-button">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    
+    <div class="reject-content">
+      <p class="text-sm text-gray-600 mb-4">
+        Please provide feedback to help the worker understand why this entry was rejected.
+      </p>
+      
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Rejection Notes</mat-label>
+        <textarea 
+          matInput 
+          [(ngModel)]="rejectNotes" 
+          rows="4"
+          placeholder="Explain why this entry is being rejected..."
+          required>
+        </textarea>
+      </mat-form-field>
+    </div>
+    
+    <div class="reject-footer">
+      <button (click)="hideRejectModal()" mat-stroked-button>
+        Cancel
+      </button>
+      <button 
+        (click)="rejectEntry()" 
+        [disabled]="!rejectNotes.trim() || isProcessing"
+        mat-raised-button 
+        color="warn">
+        <mat-icon>cancel</mat-icon>
+        Reject Entry
+      </button>
+    </div>
+  </div>
+</div>

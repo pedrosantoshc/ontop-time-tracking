@@ -1,0 +1,175 @@
+<div class="min-h-screen bg-ontop-gray p-4">
+  <div class="max-w-6xl mx-auto">
+
+    <!-- Header -->
+    <div class="card-ontop mb-6" *ngIf="worker">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">
+            <mat-icon class="inline-icon text-ontop-blue">dashboard</mat-icon>
+            My Dashboard
+          </h1>
+          <p class="text-gray-600">Welcome back, {{ worker.name }}!</p>
+        </div>
+        <button mat-stroked-button (click)="navigateToTracking()" class="flex items-center space-x-2">
+          <mat-icon>schedule</mat-icon>
+          <span>Back to Tracking</span>
+        </button>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-blue-600 font-medium">Total Hours</p>
+              <p class="text-2xl font-bold text-blue-900">{{ formatHours(stats.totalHours) }}</p>
+            </div>
+            <mat-icon class="text-blue-600">schedule</mat-icon>
+          </div>
+        </div>
+
+        <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-green-600 font-medium">Approved</p>
+              <p class="text-2xl font-bold text-green-900">{{ formatHours(stats.approvedHours) }}</p>
+            </div>
+            <mat-icon class="text-green-600">check_circle</mat-icon>
+          </div>
+        </div>
+
+        <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-yellow-600 font-medium">Pending</p>
+              <p class="text-2xl font-bold text-yellow-900">{{ formatHours(stats.pendingHours) }}</p>
+            </div>
+            <mat-icon class="text-yellow-600">schedule</mat-icon>
+          </div>
+        </div>
+
+        <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-red-600 font-medium">This Week</p>
+              <p class="text-2xl font-bold text-red-900">{{ formatHours(stats.thisWeekHours) }}</p>
+            </div>
+            <mat-icon class="text-red-600">today</mat-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="card-ontop mb-6">
+      <div class="border-b border-gray-200 mb-4">
+        <nav class="flex space-x-8">
+          <button 
+            *ngFor="let filter of statusFilters" 
+            (click)="setActiveFilter(filter.key)"
+            [class]="getFilterTabClass(filter.key)"
+            class="py-2 px-1 border-b-2 font-medium text-sm transition-colors">
+            <mat-icon class="inline-icon">{{ filter.icon }}</mat-icon>
+            {{ filter.label }} ({{ getCountForFilter(filter.key) }})
+          </button>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Time Entries List -->
+    <div class="space-y-4">
+      <div *ngFor="let entry of filteredEntries" class="card-ontop hover:shadow-md transition-shadow">
+        <div class="flex items-start justify-between">
+          <div class="flex-1">
+            <div class="flex items-center space-x-3 mb-2">
+              <mat-icon [class]="entry.statusColor">{{ entry.statusIcon }}</mat-icon>
+              <span class="font-medium text-gray-900">{{ formatDate(entry.timeEntry.date) }}</span>
+              <span class="px-2 py-1 rounded-full text-xs font-medium" [class]="getStatusChipClass(entry.timeEntry.status)">
+                {{ entry.statusText }}
+              </span>
+            </div>
+
+            <div class="ml-6">
+              <div class="flex items-center space-x-4 text-sm text-gray-600 mb-2">
+                <span><strong>Hours:</strong> {{ formatHours(calculateEntryHours(entry.timeEntry)) }}</span>
+                <span *ngIf="entry.timeEntry.startTime && entry.timeEntry.endTime">
+                  <strong>Time:</strong> {{ entry.timeEntry.startTime }} - {{ entry.timeEntry.endTime }}
+                </span>
+              </div>
+
+              <p class="text-gray-700 mb-3" *ngIf="entry.timeEntry.description">
+                <strong>Description:</strong> {{ entry.timeEntry.description }}
+              </p>
+
+              <!-- Proof of Work -->
+              <div *ngIf="entry.timeEntry.proofOfWork.length > 0" class="mb-3">
+                <p class="text-sm font-medium text-gray-700 mb-2">Proof of Work:</p>
+                <div class="flex space-x-2">
+                  <span *ngFor="let proof of entry.timeEntry.proofOfWork" 
+                        class="px-2 py-1 bg-gray-100 rounded text-xs text-gray-600">
+                    <mat-icon class="inline-icon text-xs">{{ getProofIcon(proof.type) }}</mat-icon>
+                    {{ proof.type === 'screenshot' ? 'Screenshot' : proof.fileName || 'File' }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Client Feedback -->
+              <div *ngIf="entry.clientFeedback" class="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <p class="text-sm font-medium text-blue-800 mb-1">
+                  <mat-icon class="inline-icon text-sm">feedback</mat-icon>
+                  Client Feedback:
+                </p>
+                <p class="text-sm text-blue-700">{{ entry.clientFeedback }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Button -->
+          <div class="ml-4">
+            <button 
+              *ngIf="entry.timeEntry.status === 'draft'"
+              mat-stroked-button 
+              color="primary"
+              (click)="editEntry(entry.timeEntry)"
+              class="text-sm">
+              <mat-icon>edit</mat-icon>
+              Edit
+            </button>
+            
+            <button 
+              *ngIf="entry.timeEntry.status === 'rejected'"
+              mat-stroked-button 
+              color="accent"
+              (click)="resubmitEntry(entry.timeEntry)"
+              class="text-sm">
+              <mat-icon>refresh</mat-icon>
+              Resubmit
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="filteredEntries.length === 0" class="card-ontop text-center py-8">
+        <mat-icon class="text-gray-400 text-6xl mb-4">assignment</mat-icon>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">No time entries found</h3>
+        <p class="text-gray-600 mb-4">
+          {{ activeFilter === 'all' ? 'You haven\'t tracked any time yet.' : 'No entries match the selected filter.' }}
+        </p>
+        <button mat-raised-button color="primary" (click)="navigateToTracking()">
+          <mat-icon>add</mat-icon>
+          Start Tracking Time
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Time Entry Editor Modal -->
+<app-time-entry-editor
+  [config]="editModalConfig"
+  [isVisible]="showEditModal"
+  (isVisibleChange)="onEditModalVisibilityChange($event)">
+</app-time-entry-editor>
