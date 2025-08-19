@@ -7,7 +7,8 @@ import { ApprovalService } from '../../services/approval.service';
 import { TimeEntry, Worker } from '../../models/interfaces';
 import { StorageService } from '../../services/storage.service';
 import { getInitials, formatDate, formatHours } from '../../utils/helpers';
-import { ProofViewerModalComponent, ProofViewerConfig } from '../shared/proof-viewer-modal';
+import { ProofViewerModalComponent } from '../shared/proof-viewer-modal';
+import type { ProofViewerConfig } from '../shared/proof-viewer-modal';
 
 @Component({
   selector: 'app-pending-approvals',

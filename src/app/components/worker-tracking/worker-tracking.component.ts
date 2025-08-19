@@ -63,7 +63,7 @@ import { v4 as uuidv4 } from 'uuid';
                 {{ formatTimer(currentSessionTime) }}
               </div>
               <p class="text-sm text-gray-600" *ngIf="isClocked">
-                Started at {{ currentEntry?.startTime }}
+                Started at {{ currentEntry.startTime }}
               </p>
             </div>
 

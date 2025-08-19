@@ -6,10 +6,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatChipsModule } from '@angular/material/chips';
-import { MatProgressBarModule } from '@angular/material/progressbar';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { StorageService } from '../../services/storage.service';
 import { Worker, WorkerDashboardEntry, WorkerStats, StatusFilter, TimeEntry } from '../../models/interfaces';
-import { TimeEntryEditorComponent, TimeEntryEditorConfig } from '../shared/time-entry-editor';
+import { TimeEntryEditorComponent } from '../shared/time-entry-editor';
+import type { TimeEntryEditorConfig } from '../shared/time-entry-editor';
 import { EditTrackingService } from '../../services/edit-tracking.service';
 
 @Component({
