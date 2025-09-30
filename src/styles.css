@@ -206,6 +206,7 @@ body {
 .text-yellow-800 { color: var(--color-warning-800); }
 .text-ontop-pink { color: var(--color-primary-500); }
 .text-ontop-red { color: var(--color-error-500); }
+.text-ontop-blue { color: var(--color-info-700); }
 
 /* Legacy background colors - many now available in design system */
 .bg-white { background-color: var(--color-background-primary); }
@@ -233,6 +234,7 @@ body {
 .border-b { border-bottom: 1px solid var(--color-neutral-200); }
 .rounded-lg { border-radius: 0.5rem; }
 .rounded-full { border-radius: 9999px; }
+.border-ontop-blue { border-color: var(--color-info-600); }
 
 /* Input styles */
 input[type="date"], 
