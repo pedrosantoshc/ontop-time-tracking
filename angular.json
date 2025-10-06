@@ -27,6 +27,7 @@
               }
             ],
             "styles": [
+              "src/ontop-theme.scss",
               "src/styles.scss"
             ],
             "scripts": []
@@ -85,6 +86,7 @@
               }
             ],
             "styles": [
+              "src/ontop-theme.scss",
               "src/styles.scss"
             ],
             "scripts": []
